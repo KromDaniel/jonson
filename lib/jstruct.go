@@ -1,17 +1,16 @@
 package lib
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"sync"
-	"fmt"
-	"encoding/json"
-	"io/ioutil"
 	"time"
 )
 
-type GoSonMap map[string]*GoSon
-type GoSon struct {
-	threadSafe  bool
+type JonsonMap map[string]*Jonson
+
+type Jonson struct {
 	rwMutex     sync.RWMutex
 	isPrimitive bool
 	kind        reflect.Kind
@@ -20,128 +19,122 @@ type GoSon struct {
 
 /*
 	Set thread safety operation is NOT thread safe, do it first thing when creating JSON
- */
-func (gs *GoSon) SetThreadSafety(isSafe bool) {
-	if gs.threadSafe == isSafe {
-		return
-	}
-	gs.threadSafe = isSafe
+*/
 
-}
-func (gs *GoSon) SetValue(v interface{}) {
-	if gs.threadSafe {
-		gs.rwMutex.Lock()
-		defer gs.rwMutex.Unlock()
-	}
+func (jsn *Jonson) SetValue(v interface{}) {
+	jsn.rwMutex.Lock()
+	defer jsn.rwMutex.Unlock()
 
 	temp := gosonize(v)
-	gs.kind = temp.kind
-	gs.value = temp.value
+	jsn.kind = temp.kind
+	jsn.value = temp.value
 }
 
-func (gs *GoSon) ToJSON() ([]byte, error) {
-	return json.Marshal(gs.ToInterface())
+func (jsn *Jonson) ToJSON() ([]byte, error) {
+	return json.Marshal(jsn.ToInterface())
 }
 
-func (gs *GoSon) ToUnsafeJson() (data []byte) {
-	data, err := gs.ToJSON()
+func (jsn *Jonson) ToUnsafeJson() (data []byte) {
+	data, err := jsn.ToJSON()
 	if err != nil {
 		return []byte{}
 	}
 	return
 }
 
-func (gs *GoSon) ToJSONString() (string, error) {
-	data, err := gs.ToJSON()
+func (jsn *Jonson) ToJSONString() (string, error) {
+	data, err := jsn.ToJSON()
 	if err != nil {
 		return "", err
 	}
 	return string(data), nil
 }
 
-func (gs *GoSon) ToInterface() interface{} {
-	if gs.IsPrimitive() {
-		return gs.value
+func (jsn *Jonson) ToInterface() interface{} {
+	if jsn.IsPrimitive() {
+		return &jsn.value
 	}
 
-	if gs.IsArray() {
-		arr := gs.GetUnsafeArray()
+	if jsn.IsSlice() {
+		begin := time.Now()
+		arr := jsn.GetUnsafeSlice()
+		unsafeSlice := time.Now().Sub(begin).Seconds()
+		begin = time.Now()
 		resArr := make([]interface{}, len(arr))
 		for k, v := range arr {
 			resArr[k] = v.ToInterface()
 		}
+		loopEnd := time.Now().Sub(begin).Seconds()
+		if len(arr) > 5000 {
+			fmt.Println("Unsafe Slice ", unsafeSlice, " loopEnd ", loopEnd, "len", len(arr))
+		}
 		return resArr
 	}
 
-	if gs.IsHashMap() {
-		hMap := gs.GetUnsafeHashMap()
+	if jsn.IsHashMap() {
+		hMap := jsn.GetUnsafeHashMap()
 		resMap := make(map[string]interface{})
 		for k, v := range hMap {
 			resMap[k] = v.ToInterface()
 		}
-		return resMap
+		return &resMap
 	}
 
-	return EmptyJSON()
+	return nil
 }
-func (gs *GoSon) Clone() *GoSon {
-	if gs.IsPrimitive() {
-		return &GoSon{
-			value:      gs.value,
-			kind:       gs.kind,
-			threadSafe: gs.threadSafe,
+func (jsn *Jonson) Clone() *Jonson {
+	if jsn.IsPrimitive() {
+		return &Jonson{
+			value: jsn.value,
+			kind:  jsn.kind,
 		}
 	}
 
-	if gs.IsArray() {
-		arr := gs.GetUnsafeArray()
-		resArr := make([]*GoSon, len(arr))
+	if jsn.IsSlice() {
+		arr := jsn.GetUnsafeSlice()
+		resArr := make([]*Jonson, len(arr))
 		for k, v := range arr {
 			resArr[k] = v.Clone()
 		}
-		return &GoSon{
-			value:      resArr,
-			kind:       reflect.Slice,
-			threadSafe: gs.threadSafe,
+		return &Jonson{
+			value: resArr,
+			kind:  reflect.Slice,
 		}
 	}
 
-	if gs.IsHashMap() {
-		hMap := gs.GetUnsafeHashMap()
-		resMap := make(map[string]*GoSon)
+	if jsn.IsHashMap() {
+		hMap := jsn.GetUnsafeHashMap()
+		resMap := make(map[string]*Jonson)
 		for k, v := range hMap {
 			resMap[k] = v.Clone()
 		}
-		return &GoSon{
-			value:      resMap,
-			kind:       reflect.Map,
-			threadSafe: gs.threadSafe,
+		return &Jonson{
+			value: resMap,
+			kind:  reflect.Map,
 		}
 	}
 
 	return EmptyJSON()
 }
 
-func (gs *GoSon) IsNil() bool {
-	return gs.value == nil
+func (jsn *Jonson) IsNil() bool {
+	return jsn.value == nil
 }
-func (gs *GoSon) IsHashMap() bool {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	if gs.IsNil() {
+func (jsn *Jonson) IsHashMap() bool {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	if jsn.IsNil() {
 		return false
 	}
-	return gs.kind == reflect.Map
+	return jsn.kind == reflect.Map
 }
 
-func (gs *GoSon) atLocked(key interface{}, keys ...interface{}) *GoSon {
-	var res *GoSon = nil
+func (jsn *Jonson) atLocked(key interface{}, keys ...interface{}) *Jonson {
+	var res *Jonson = nil
 	switch reflect.TypeOf(key).Kind() {
 	case reflect.Int, reflect.Uint:
-		isArray, arr := gs.GetArray()
-		if isArray {
+		isSlice, arr := jsn.GetSlice()
+		if isSlice {
 			index := key.(int)
 			if index < len(arr) {
 				res = arr[index]
@@ -149,7 +142,7 @@ func (gs *GoSon) atLocked(key interface{}, keys ...interface{}) *GoSon {
 		}
 		break
 	case reflect.String:
-		isObject, obj := gs.GetHashMap()
+		isObject, obj := jsn.GetHashMap()
 		if isObject {
 			hashKey := key.(string)
 			if val, ok := obj[hashKey]; ok {
@@ -166,183 +159,33 @@ func (gs *GoSon) atLocked(key interface{}, keys ...interface{}) *GoSon {
 	}
 	return res
 }
-func (gs *GoSon) At(key interface{}, keys ...interface{}) *GoSon {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	res := gs.atLocked(key, keys...)
+func (jsn *Jonson) At(key interface{}, keys ...interface{}) *Jonson {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	res := jsn.atLocked(key, keys...)
 	return res
 }
 
-func (gs *GoSon) IsArray() bool {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	if gs.IsNil() {
+func (jsn *Jonson) IsSlice() bool {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	if jsn.IsNil() {
 		return false
 	}
-	return gs.kind == reflect.Slice
+	return jsn.kind == reflect.Slice
 }
 
-func (gs *GoSon) IsPrimitive() bool {
-	return !(gs.IsArray() || gs.IsHashMap() || gs.IsStruct())
+func (jsn *Jonson) IsPrimitive() bool {
+	return !(jsn.IsSlice() || jsn.IsHashMap())
 }
 
-func (gs *GoSon) IsStruct() bool {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	if gs.IsNil() {
-		return false
-	}
-
-	return gs.kind == reflect.Struct
+func (jsn *Jonson) GetValue() interface{} {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	return jsn.value
 }
 
-func (gs *GoSon) GetValue() interface{} {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-
-	return gs.value
-}
-
-// ==== Getter helpers ====//
-func (gs *GoSon) GetInt() (isInt bool, value int) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isInt = gs.kind == reflect.Int
-	if isInt {
-		value = gs.value.(int)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeInt() (value int) {
-	_, value = gs.GetInt()
-	return
-}
-
-func (gs *GoSon) GetFloat32() (isFloat32 bool, value float32) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isFloat32 = gs.kind == reflect.Float32
-	if isFloat32 {
-		value = gs.value.(float32)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeFloat32() (value float32) {
-	_, value = gs.GetFloat32()
-	return
-}
-
-func (gs *GoSon) GetFloat64() (isFloat64 bool, value float64) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isFloat64 = gs.kind == reflect.Float64
-	if isFloat64 {
-		value = gs.value.(float64)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeFloat64() (value float64) {
-	_, value = gs.GetFloat64()
-	return
-}
-
-func (gs *GoSon) GetBool() (isBool bool, value bool) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isBool = gs.kind == reflect.Bool
-	if isBool {
-		value = gs.value.(bool)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeBool() (value bool) {
-	_, value = gs.GetBool()
-	return
-}
-
-func (gs *GoSon) GetString() (isString bool, value string) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isString = gs.kind == reflect.String
-	if isString {
-		value = gs.value.(string)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeString() (value string) {
-	_, value = gs.GetString()
-	return
-}
-
-func (gs *GoSon) GetHashMap() (isHashMap bool, value GoSonMap) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isHashMap = gs.kind == reflect.Map
-	if isHashMap {
-		value = gs.value.(map[string]*GoSon)
-	}
-	return
-}
-
-func (gs *GoSon) GetUnsafeHashMap() (value map[string]*GoSon) {
-	isHashMap, m := gs.GetHashMap()
-	if isHashMap {
-		value = m
-		return
-	}
-	value = make(map[string]*GoSon)
-	return
-}
-
-func (gs *GoSon) GetArray() (isArray bool, value []*GoSon) {
-	if gs.threadSafe {
-		gs.rwMutex.RLock()
-		defer gs.rwMutex.RUnlock()
-	}
-	isArray = gs.kind == reflect.Slice
-	if isArray {
-		value = gs.value.([]*GoSon)
-	}
-
-	return
-}
-
-func (gs *GoSon) GetUnsafeArray() (value []*GoSon) {
-	isArray, m := gs.GetArray();
-	if isArray {
-		value = m
-		return
-	}
-	value = make([]*GoSon, 0)
-	return
-}
-
-func gosonize(value interface{}) *GoSon {
+func gosonize(value interface{}) *Jonson {
 	if value == nil {
 		return EmptyJSON()
 	}
@@ -358,17 +201,27 @@ func gosonize(value interface{}) *GoSon {
 		return gosonizeMap(&vMap)
 	case reflect.Slice:
 		return gosonizeSlice(&vo)
-	case reflect.String, reflect.Uint, reflect.Bool, reflect.Float64,
-		reflect.Float32, reflect.Int, reflect.Uint8, reflect.Uint16,
-		reflect.Uint32, reflect.Uint64, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return &GoSon{
+	case reflect.String,
+		reflect.Bool,
+		reflect.Float64,
+		reflect.Float32,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64:
+		return &Jonson{
 			value:       value,
 			isPrimitive: true,
 			kind:        vo.Kind(),
-			threadSafe:  true,
 		}
 	case reflect.Struct:
-		if v, ok := value.(GoSon); ok {
+		if v, ok := value.(Jonson); ok {
 			return &v
 		}
 		tempMap := make(map[string]interface{})
@@ -391,56 +244,52 @@ func gosonize(value interface{}) *GoSon {
 	return EmptyJSON()
 }
 
-func gosonizeMap(value *map[string]interface{}) *GoSon {
-	fmt.Println("GOSONIZE MAP")
-	mapValue := make(map[string]*GoSon)
+func gosonizeMap(value *map[string]interface{}) *Jonson {
+	mapValue := make(map[string]*Jonson)
 	for k, v := range *value {
 		mapValue[k] = gosonize(v)
 	}
 
-	return &GoSon{
+	return &Jonson{
 		value:       mapValue,
 		isPrimitive: false,
 		kind:        reflect.Map,
-		threadSafe:  true,
 	}
 }
 
-func gosonizeSlice(value *reflect.Value) *GoSon {
-	arrValue := make([]*GoSon, value.Len())
-	for i:=0; i < value.Len(); i++ {
+func gosonizeSlice(value *reflect.Value) *Jonson {
+	arrValue := make([]*Jonson, value.Len())
+	for i := 0; i < value.Len(); i++ {
 		arrValue[i] = gosonize(value.Index(i).Interface())
 	}
 
-	return &GoSon{
+	return &Jonson{
 		value:       arrValue,
 		isPrimitive: false,
 		kind:        reflect.Slice,
-		threadSafe:  true,
 	}
 }
 
-func New(value interface{}) *GoSon {
+func New(value interface{}) *Jonson {
 	return gosonize(value)
 }
 
-func EmptyJSON() *GoSon {
-	return &GoSon{
+func EmptyJSON() *Jonson {
+	return &Jonson{
 		value:       nil,
 		isPrimitive: true,
-		threadSafe:  true,
 	}
 }
 
-func EmptyHashJSON() *GoSon {
-	return New(make(map[string]*GoSon))
+func EmptyHashJSON() *Jonson {
+	return New(make(map[string]*Jonson))
 }
 
-func EmptyArray() *GoSon {
-	return New(make(map[string]*GoSon))
+func EmptySlice() *Jonson {
+	return New(make(map[string]*Jonson))
 }
 
-func Parse(data []byte) (err error, goson *GoSon) {
+func Parse(data []byte) (err error, goson *Jonson) {
 	var m interface{}
 	err = json.Unmarshal(data, &m)
 	if err != nil {
@@ -450,31 +299,10 @@ func Parse(data []byte) (err error, goson *GoSon) {
 	return
 }
 
-func ParseUnsafe(data []byte) *GoSon {
+func ParseUnsafe(data []byte) *Jonson {
 	_, goson := Parse(data)
 	if goson == nil {
 		return EmptyJSON()
 	}
 	return goson
-}
-
-func Test() {
-	readBegin := time.Now()
-	b, err := ioutil.ReadFile("/Users/danielkrom/Dev/sf-city-lots-json/smaller.json")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var m interface{}
-	json.Unmarshal([]byte(string(b)), &m)
-	readEnd := time.Now().Sub(readBegin).Seconds()
-	fmt.Println("Read and parse", readEnd)
-	for i :=0; i < 5; i++{
-		createBegin := time.Now()
-		t := New(b)
-		fmt.Println("Create", time.Now().Sub(createBegin).Seconds())
-		fmt.Println(t.threadSafe)
-		fmt.Println(t.At("features"))
-	}
-
 }

@@ -1,6 +1,6 @@
 package main
 
-import "me/GSON/lib"
+import "github.com/KromDaniel/GoSon/lib"
 
 func main() {
 	lib.Test()
