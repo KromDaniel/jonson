@@ -1,8 +1,14 @@
-package lib
+package main
 
 import "reflect"
 
 // ==== Getter helpers ====//
+
+func (jsn *Jonson) GetValue() interface{} {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	return jsn.value
+}
 
 func (jsn *Jonson) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
@@ -75,7 +81,7 @@ func (jsn *Jonson) IsSlice() bool {
 }
 
 func (jsn *Jonson) IsPrimitive() bool {
-	return !(jsn.IsSlice() || jsn.IsHashMap())
+	return jsn.isPrimitive
 }
 
 func (jsn *Jonson) GetInt() (isInt bool, value int) {
@@ -357,3 +363,41 @@ func (jsn *Jonson) GetSliceLen() int {
 	defer jsn.rwMutex.RUnlock()
 	return len(slice)
 }
+
+func (jsn *Jonson) atLocked(key interface{}, keys ...interface{}) *Jonson {
+	var res *Jonson = nil
+	switch reflect.TypeOf(key).Kind() {
+	case reflect.Int, reflect.Uint:
+		isSlice, arr := jsn.GetSlice()
+		if isSlice {
+			index := key.(int)
+			if index < len(arr) {
+				res = arr[index]
+			}
+		}
+		break
+	case reflect.String:
+		isObject, obj := jsn.GetHashMap()
+		if isObject {
+			hashKey := key.(string)
+			if val, ok := obj[hashKey]; ok {
+				res = val
+			}
+		}
+		break
+	}
+	if len(keys) > 0 && res != nil {
+		return res.atLocked(keys[0], keys[1:]...)
+	}
+	if res == nil {
+		res = NewEmptyJSON()
+	}
+	return res
+}
+func (jsn *Jonson) At(key interface{}, keys ...interface{}) *Jonson {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	res := jsn.atLocked(key, keys...)
+	return res
+}
+

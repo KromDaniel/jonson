@@ -1,10 +1,10 @@
-package lib
+package main
 
-func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) {
+func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) *Jonson {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
-		return
+		return jsn
 	}
 
 	jsn.rwMutex.RLock()
@@ -12,37 +12,39 @@ func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) {
 	for i, v := range slice {
 		cb(v, i)
 	}
+	return jsn
 }
 
-func (jsn *Jonson) SliceMap(cb func(*Jonson, int) interface{}) {
+func (jsn *Jonson) SliceMap(cb func(*Jonson, int) interface{})*Jonson {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
-		return
+		return jsn
 	}
 	jsn.rwMutex.RLock()
 	mappedArr := make([]*Jonson, len(slice))
 	for i, v := range slice {
-		mappedArr[i] = gosonize(cb(v, i))
+		mappedArr[i] = jonsonize(cb(v, i))
 	}
 	jsn.rwMutex.RUnlock()
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
 
 	jsn.value = mappedArr
+	return jsn
 }
 
-func (jsn *Jonson) SliceFilter(cb func(*Jonson, int) bool) {
+func (jsn *Jonson) SliceFilter(cb func(*Jonson, int) bool)*Jonson {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
-		return
+		return jsn
 	}
 	jsn.rwMutex.RLock()
 	filteredArr := make([]*Jonson, 0)
 	for i, v := range slice {
-		if keep := cb(v, i); keep {
-			filteredArr = append(filteredArr, v)
+		if cb(v, i){
+			filteredArr = append(filteredArr, slice[i])
 		}
 	}
 	jsn.rwMutex.RUnlock()
@@ -50,13 +52,14 @@ func (jsn *Jonson) SliceFilter(cb func(*Jonson, int) bool) {
 	defer jsn.rwMutex.Unlock()
 
 	jsn.value = filteredArr
+	return jsn
 }
 
-func (jsn *Jonson) HashMapForEach(cb func(*Jonson, string)) {
+func (jsn *Jonson) HashMapForEach(cb func(*Jonson, string)) *Jonson {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {
-		return
+		return jsn
 	}
 
 	jsn.rwMutex.RLock()
@@ -64,38 +67,40 @@ func (jsn *Jonson) HashMapForEach(cb func(*Jonson, string)) {
 	for k, v := range hMap {
 		cb(v, k)
 	}
+	return jsn
 }
 
-func (jsn *Jonson) HashMapMap(cb func(*Jonson, string) interface{}) {
+func (jsn *Jonson) HashMapMap(cb func(*Jonson, string) interface{})  *Jonson {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {
-		return
+		return jsn
 	}
 
 	jsn.rwMutex.RLock()
 	res := make(JonsonMap)
 	for k, v := range hMap {
-		res[k] = gosonize(cb(v, k))
+		res[k] = jonsonize(cb(v, k))
 	}
 	jsn.rwMutex.RUnlock()
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
 
 	jsn.value = res
+	return jsn
 }
 
-func (jsn *Jonson) HashMapFilter(cb func(*Jonson, string) bool) {
+func (jsn *Jonson) HashMapFilter(cb func(*Jonson, string) bool)  *Jonson {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {
-		return
+		return jsn
 	}
 
 	jsn.rwMutex.RLock()
 	res := make(JonsonMap)
 	for k, v := range hMap {
-		if keep := cb(v, k); keep {
+		if cb(v, k) {
 			res[k] = v
 		}
 	}
@@ -104,4 +109,5 @@ func (jsn *Jonson) HashMapFilter(cb func(*Jonson, string) bool) {
 	defer jsn.rwMutex.Unlock()
 
 	jsn.value = res
+	return jsn
 }
