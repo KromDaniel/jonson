@@ -22,7 +22,12 @@ func main(){
 
 	someMap := make(map[string]interface{})
 	someMap["nested"] = "I'm nested value"
-	json.At("keyB").SliceAppendBegin("someString", 90,someMap)
+	json.At("keyB").SliceAppendBegin("someString", 90,someMap) //{"keyA":1,"keyB":[{"nested":"I'm nested value"},90,"someString",15]}
+
+	// let's remove keyA
+	json.HashMapFilter(func(json *Jonson.JSON, s string) bool {
+		return !json.IsInt()  //{"keyB":[{"nested":"I'm nested value"},90,"someString",15]}
+	})
 
 	fmt.Println(json.ToUnsafeJSONString())
 }
