@@ -21,15 +21,6 @@ type Jonson struct {
 	Set thread safety operation is NOT thread safe, do it first thing when creating JSON
 */
 
-func (jsn *Jonson) SetValue(v interface{}) {
-	jsn.rwMutex.Lock()
-	defer jsn.rwMutex.Unlock()
-
-	temp := gosonize(v)
-	jsn.kind = temp.kind
-	jsn.value = temp.value
-}
-
 func (jsn *Jonson) ToJSON() ([]byte, error) {
 	return json.Marshal(jsn.ToInterface())
 }
@@ -48,6 +39,14 @@ func (jsn *Jonson) ToJSONString() (string, error) {
 		return "", err
 	}
 	return string(data), nil
+}
+
+func (jsn *Jonson) ToUnsafeJSONString() string {
+	data, err := jsn.ToJSON()
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }
 
 func (jsn *Jonson) ToInterface() interface{} {
@@ -117,18 +116,6 @@ func (jsn *Jonson) Clone() *Jonson {
 	return EmptyJSON()
 }
 
-func (jsn *Jonson) IsNil() bool {
-	return jsn.value == nil
-}
-func (jsn *Jonson) IsHashMap() bool {
-	jsn.rwMutex.RLock()
-	defer jsn.rwMutex.RUnlock()
-	if jsn.IsNil() {
-		return false
-	}
-	return jsn.kind == reflect.Map
-}
-
 func (jsn *Jonson) atLocked(key interface{}, keys ...interface{}) *Jonson {
 	var res *Jonson = nil
 	switch reflect.TypeOf(key).Kind() {
@@ -166,18 +153,7 @@ func (jsn *Jonson) At(key interface{}, keys ...interface{}) *Jonson {
 	return res
 }
 
-func (jsn *Jonson) IsSlice() bool {
-	jsn.rwMutex.RLock()
-	defer jsn.rwMutex.RUnlock()
-	if jsn.IsNil() {
-		return false
-	}
-	return jsn.kind == reflect.Slice
-}
 
-func (jsn *Jonson) IsPrimitive() bool {
-	return !(jsn.IsSlice() || jsn.IsHashMap())
-}
 
 func (jsn *Jonson) GetValue() interface{} {
 	jsn.rwMutex.RLock()
@@ -197,8 +173,7 @@ func gosonize(value interface{}) *Jonson {
 	case reflect.Ptr:
 		return gosonize(vo.Elem())
 	case reflect.Map:
-		vMap := value.(map[string]interface{})
-		return gosonizeMap(&vMap)
+		return gosonizeMap(&vo)
 	case reflect.Slice:
 		return gosonizeSlice(&vo)
 	case reflect.String,
@@ -238,16 +213,21 @@ func gosonize(value interface{}) *Jonson {
 				tempMap[fieldValue.Name] = vo.Field(i).Interface()
 			}
 		}
-		return gosonizeMap(&tempMap)
+		return gosonize(&tempMap)
 	}
 
 	return EmptyJSON()
 }
 
-func gosonizeMap(value *map[string]interface{}) *Jonson {
-	mapValue := make(map[string]*Jonson)
-	for k, v := range *value {
-		mapValue[k] = gosonize(v)
+func gosonizeMap(value *reflect.Value) *Jonson {
+	mapValue := make(JonsonMap)
+	for _, k := range value.MapKeys() {
+		// map should be only string as keys
+		keyValue := reflect.ValueOf(k)
+		if keyValue.Kind() != reflect.String{
+			continue
+		}
+		mapValue[keyValue.String()] = gosonize(keyValue.MapIndex(k))
 	}
 
 	return &Jonson{
@@ -282,11 +262,11 @@ func EmptyJSON() *Jonson {
 }
 
 func EmptyHashJSON() *Jonson {
-	return New(make(map[string]*Jonson))
+	return New(make(map[string]interface{}))
 }
 
 func EmptySlice() *Jonson {
-	return New(make(map[string]*Jonson))
+	return New(make([]interface{}, 0))
 }
 
 func Parse(data []byte) (err error, goson *Jonson) {

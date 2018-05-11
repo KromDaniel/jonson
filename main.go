@@ -1,7 +1,14 @@
 package main
 
-import "github.com/KromDaniel/GoSon/lib"
+import (
+	"github.com/KromDaniel/GoSon/lib"
+	"fmt"
+)
 
 func main() {
-	lib.Test()
+	json := lib.EmptyHashJSON()
+	json.HashSet("Yoho", "65")
+
+	str, _ := json.ToJSONString()
+	fmt.Println(str)
 }

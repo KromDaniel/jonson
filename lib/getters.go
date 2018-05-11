@@ -4,28 +4,78 @@ import "reflect"
 
 // ==== Getter helpers ====//
 
-func (jsn *Jonson) IsType(p reflect.Kind) bool{
+func (jsn *Jonson) IsType(p reflect.Kind) bool {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
 	return jsn.kind == p
 }
 
-func (jsn *Jonson) IsInt() bool{
+func (jsn *Jonson) IsInt() bool {
 	return jsn.IsType(reflect.Int)
 }
 
-func (jsn *Jonson) IsInt8() bool{
+func (jsn *Jonson) IsInt8() bool {
 	return jsn.IsType(reflect.Int8)
 }
 
-func (jsn *Jonson) IsInt16() bool{
+func (jsn *Jonson) IsInt16() bool {
 	return jsn.IsType(reflect.Int16)
 }
 
-func (jsn *Jonson) IsInt32() bool{
+func (jsn *Jonson) IsInt32() bool {
 	return jsn.IsType(reflect.Int32)
 }
 
-func (jsn *Jonson) IsInt64() bool{
+func (jsn *Jonson) IsInt64() bool {
 	return jsn.IsType(reflect.Int64)
+}
+
+func (jsn *Jonson) IsBool() bool {
+	return jsn.IsType(reflect.Bool)
+}
+
+func (jsn *Jonson) IsFloat32() bool {
+	return jsn.IsType(reflect.Float32)
+}
+
+func (jsn *Jonson) IsFloat64() bool {
+	return jsn.IsType(reflect.Float64)
+}
+
+func (jsn *Jonson) IsUint() bool {
+	return jsn.IsType(reflect.Uint)
+}
+
+func (jsn *Jonson) IsUint8() bool {
+	return jsn.IsType(reflect.Uint8)
+}
+
+func (jsn *Jonson) IsUint16() bool {
+	return jsn.IsType(reflect.Uint16)
+}
+
+func (jsn *Jonson) IsUint32() bool {
+	return jsn.IsType(reflect.Uint32)
+}
+
+func (jsn *Jonson) IsUint64() bool {
+	return jsn.IsType(reflect.Uint64)
+}
+
+func (jsn *Jonson) IsNil() bool {
+	return jsn.value == nil
+}
+
+func (jsn *Jonson) IsHashMap() bool {
+	return jsn.IsType(reflect.Map)
+}
+
+func (jsn *Jonson) IsSlice() bool {
+	return jsn.IsType(reflect.Slice)
+}
+
+func (jsn *Jonson) IsPrimitive() bool {
+	return !(jsn.IsSlice() || jsn.IsHashMap())
 }
 
 func (jsn *Jonson) GetInt() (isInt bool, value int) {
@@ -168,7 +218,7 @@ func (jsn *Jonson) GetHashMap() (isHashMap bool, value JonsonMap) {
 	defer jsn.rwMutex.RUnlock()
 	isHashMap = jsn.kind == reflect.Map
 	if isHashMap {
-		value = jsn.value.(map[string]*Jonson)
+		value = jsn.value.(JonsonMap)
 	}
 	return
 }
@@ -179,7 +229,7 @@ func (jsn *Jonson) GetUnsafeHashMap() (value map[string]*Jonson) {
 		value = m
 		return
 	}
-	value = make(map[string]*Jonson)
+	value = make(JonsonMap)
 	return
 }
 
@@ -277,4 +327,33 @@ func (jsn *Jonson) GetUint64() (isUint64 bool, value uint64) {
 func (jsn *Jonson) GetUnsafeUint64() (value uint64) {
 	_, value = jsn.GetUint64()
 	return
+}
+
+func (jsn *Jonson) GetHashMapKeys() []string {
+	isMap, hMap := jsn.GetHashMap()
+	if !isMap {
+		return nil
+	}
+
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+
+	keys := make([]string, len(hMap))
+	i := 0
+	for k := range hMap {
+		keys[i] = k
+		i++
+	}
+	return keys
+}
+
+func (jsn *Jonson) GetSliceLen() int {
+	isSlice, slice := jsn.GetSlice()
+	if !isSlice {
+		return 0
+	}
+
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	return len(slice)
 }
