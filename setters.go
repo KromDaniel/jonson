@@ -1,4 +1,4 @@
-package main
+package Jonson
 
 func (jsn *Jonson) Set(v interface{}) *Jonson {
 	jsn.rwMutex.Lock()

@@ -1,4 +1,4 @@
-package main
+package Jonson
 
 import (
 	"encoding/json"

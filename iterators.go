@@ -1,4 +1,4 @@
-package main
+package Jonson
 
 func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) *Jonson {
 	isSlice, slice := jsn.GetSlice()
