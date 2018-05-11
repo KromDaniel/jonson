@@ -5,9 +5,9 @@ import (
 	"sync"
 )
 
-type JonsonMap map[string]*Jonson
+type JonsonMap map[string]*JSON
 
-type Jonson struct {
+type JSON struct {
 	rwMutex     sync.RWMutex
 	isPrimitive bool
 	kind        reflect.Kind

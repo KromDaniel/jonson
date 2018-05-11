@@ -1,6 +1,6 @@
 package Jonson
 
-func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) *Jonson {
+func (jsn *JSON) SliceForEach(cb func(*JSON, int)) *JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
@@ -15,14 +15,14 @@ func (jsn *Jonson) SliceForEach(cb func(*Jonson, int)) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) SliceMap(cb func(*Jonson, int) interface{})*Jonson {
+func (jsn *JSON) SliceMap(cb func(*JSON, int) interface{})*JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
 		return jsn
 	}
 	jsn.rwMutex.RLock()
-	mappedArr := make([]*Jonson, len(slice))
+	mappedArr := make([]*JSON, len(slice))
 	for i, v := range slice {
 		mappedArr[i] = jonsonize(cb(v, i))
 	}
@@ -34,14 +34,14 @@ func (jsn *Jonson) SliceMap(cb func(*Jonson, int) interface{})*Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) SliceFilter(cb func(*Jonson, int) bool)*Jonson {
+func (jsn *JSON) SliceFilter(cb func(*JSON, int) bool)*JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
 		return jsn
 	}
 	jsn.rwMutex.RLock()
-	filteredArr := make([]*Jonson, 0)
+	filteredArr := make([]*JSON, 0)
 	for i, v := range slice {
 		if cb(v, i){
 			filteredArr = append(filteredArr, slice[i])
@@ -55,7 +55,7 @@ func (jsn *Jonson) SliceFilter(cb func(*Jonson, int) bool)*Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) HashMapForEach(cb func(*Jonson, string)) *Jonson {
+func (jsn *JSON) HashMapForEach(cb func(*JSON, string)) *JSON {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {
@@ -70,7 +70,7 @@ func (jsn *Jonson) HashMapForEach(cb func(*Jonson, string)) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) HashMapMap(cb func(*Jonson, string) interface{})  *Jonson {
+func (jsn *JSON) HashMapMap(cb func(*JSON, string) interface{})  *JSON {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {
@@ -90,7 +90,7 @@ func (jsn *Jonson) HashMapMap(cb func(*Jonson, string) interface{})  *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) HashMapFilter(cb func(*Jonson, string) bool)  *Jonson {
+func (jsn *JSON) HashMapFilter(cb func(*JSON, string) bool)  *JSON {
 	isMap, hMap := jsn.GetHashMap()
 
 	if !isMap {

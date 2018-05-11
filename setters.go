@@ -1,6 +1,6 @@
 package Jonson
 
-func (jsn *Jonson) Set(v interface{}) *Jonson {
+func (jsn *JSON) Set(v interface{}) *JSON {
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
 
@@ -11,7 +11,7 @@ func (jsn *Jonson) Set(v interface{}) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) HashSet(key string, value interface{}) *Jonson {
+func (jsn *JSON) HashSet(key string, value interface{}) *JSON {
 	isHashMap, hashMap := jsn.GetHashMap()
 	if !isHashMap {
 		return jsn
@@ -24,7 +24,7 @@ func (jsn *Jonson) HashSet(key string, value interface{}) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) SliceAppend(value ...interface{}) *Jonson {
+func (jsn *JSON) SliceAppend(value ...interface{}) *JSON {
 	isSlice, arr := jsn.GetSlice()
 	if !isSlice {
 		return jsn
@@ -38,7 +38,7 @@ func (jsn *Jonson) SliceAppend(value ...interface{}) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) SliceAppendBegin(value ...interface{}) *Jonson {
+func (jsn *JSON) SliceAppendBegin(value ...interface{}) *JSON {
 	isSlice, arr := jsn.GetSlice()
 	if !isSlice {
 		return jsn
@@ -46,7 +46,7 @@ func (jsn *Jonson) SliceAppendBegin(value ...interface{}) *Jonson {
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
 	for _, v := range value {
-		arr = append([]*Jonson{jonsonize(v)}, arr...)
+		arr = append([]*JSON{jonsonize(v)}, arr...)
 	}
 
 	jsn.value = arr
@@ -54,7 +54,7 @@ func (jsn *Jonson) SliceAppendBegin(value ...interface{}) *Jonson {
 	return jsn
 }
 
-func (jsn *Jonson) SliceSet(index int, value interface{}) *Jonson {
+func (jsn *JSON) SliceSet(index int, value interface{}) *JSON {
 	isSlice, arr := jsn.GetSlice()
 	if !isSlice {
 		return jsn

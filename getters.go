@@ -4,87 +4,87 @@ import "reflect"
 
 // ==== Getter helpers ====//
 
-func (jsn *Jonson) GetValue() interface{} {
+func (jsn *JSON) GetValue() interface{} {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	return jsn.value
 }
 
-func (jsn *Jonson) IsType(p reflect.Kind) bool {
+func (jsn *JSON) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	return jsn.kind == p
 }
 
-func (jsn *Jonson) IsInt() bool {
+func (jsn *JSON) IsInt() bool {
 	return jsn.IsType(reflect.Int)
 }
 
-func (jsn *Jonson) IsInt8() bool {
+func (jsn *JSON) IsInt8() bool {
 	return jsn.IsType(reflect.Int8)
 }
 
-func (jsn *Jonson) IsInt16() bool {
+func (jsn *JSON) IsInt16() bool {
 	return jsn.IsType(reflect.Int16)
 }
 
-func (jsn *Jonson) IsInt32() bool {
+func (jsn *JSON) IsInt32() bool {
 	return jsn.IsType(reflect.Int32)
 }
 
-func (jsn *Jonson) IsInt64() bool {
+func (jsn *JSON) IsInt64() bool {
 	return jsn.IsType(reflect.Int64)
 }
 
-func (jsn *Jonson) IsBool() bool {
+func (jsn *JSON) IsBool() bool {
 	return jsn.IsType(reflect.Bool)
 }
 
-func (jsn *Jonson) IsFloat32() bool {
+func (jsn *JSON) IsFloat32() bool {
 	return jsn.IsType(reflect.Float32)
 }
 
-func (jsn *Jonson) IsFloat64() bool {
+func (jsn *JSON) IsFloat64() bool {
 	return jsn.IsType(reflect.Float64)
 }
 
-func (jsn *Jonson) IsUint() bool {
+func (jsn *JSON) IsUint() bool {
 	return jsn.IsType(reflect.Uint)
 }
 
-func (jsn *Jonson) IsUint8() bool {
+func (jsn *JSON) IsUint8() bool {
 	return jsn.IsType(reflect.Uint8)
 }
 
-func (jsn *Jonson) IsUint16() bool {
+func (jsn *JSON) IsUint16() bool {
 	return jsn.IsType(reflect.Uint16)
 }
 
-func (jsn *Jonson) IsUint32() bool {
+func (jsn *JSON) IsUint32() bool {
 	return jsn.IsType(reflect.Uint32)
 }
 
-func (jsn *Jonson) IsUint64() bool {
+func (jsn *JSON) IsUint64() bool {
 	return jsn.IsType(reflect.Uint64)
 }
 
-func (jsn *Jonson) IsNil() bool {
+func (jsn *JSON) IsNil() bool {
 	return jsn.value == nil
 }
 
-func (jsn *Jonson) IsHashMap() bool {
+func (jsn *JSON) IsHashMap() bool {
 	return jsn.IsType(reflect.Map)
 }
 
-func (jsn *Jonson) IsSlice() bool {
+func (jsn *JSON) IsSlice() bool {
 	return jsn.IsType(reflect.Slice)
 }
 
-func (jsn *Jonson) IsPrimitive() bool {
+func (jsn *JSON) IsPrimitive() bool {
 	return jsn.isPrimitive
 }
 
-func (jsn *Jonson) GetInt() (isInt bool, value int) {
+func (jsn *JSON) GetInt() (isInt bool, value int) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isInt = jsn.kind == reflect.Int
@@ -94,12 +94,12 @@ func (jsn *Jonson) GetInt() (isInt bool, value int) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeInt() (value int) {
+func (jsn *JSON) GetUnsafeInt() (value int) {
 	_, value = jsn.GetInt()
 	return
 }
 
-func (jsn *Jonson) GetInt8() (isInt8 bool, value int8) {
+func (jsn *JSON) GetInt8() (isInt8 bool, value int8) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isInt8 = jsn.kind == reflect.Int8
@@ -109,12 +109,12 @@ func (jsn *Jonson) GetInt8() (isInt8 bool, value int8) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeInt8() (value int8) {
+func (jsn *JSON) GetUnsafeInt8() (value int8) {
 	_, value = jsn.GetInt8()
 	return
 }
 
-func (jsn *Jonson) GetInt16() (isInt16 bool, value int16) {
+func (jsn *JSON) GetInt16() (isInt16 bool, value int16) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isInt16 = jsn.kind == reflect.Int16
@@ -124,12 +124,12 @@ func (jsn *Jonson) GetInt16() (isInt16 bool, value int16) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeInt16() (value int16) {
+func (jsn *JSON) GetUnsafeInt16() (value int16) {
 	_, value = jsn.GetInt16()
 	return
 }
 
-func (jsn *Jonson) GetInt32() (isInt32 bool, value int32) {
+func (jsn *JSON) GetInt32() (isInt32 bool, value int32) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isInt32 = jsn.kind == reflect.Int32
@@ -139,12 +139,12 @@ func (jsn *Jonson) GetInt32() (isInt32 bool, value int32) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeInt32() (value int32) {
+func (jsn *JSON) GetUnsafeInt32() (value int32) {
 	_, value = jsn.GetInt32()
 	return
 }
 
-func (jsn *Jonson) GetInt64() (isInt64 bool, value int64) {
+func (jsn *JSON) GetInt64() (isInt64 bool, value int64) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isInt64 = jsn.kind == reflect.Int64
@@ -154,12 +154,12 @@ func (jsn *Jonson) GetInt64() (isInt64 bool, value int64) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeInt64() (value int64) {
+func (jsn *JSON) GetUnsafeInt64() (value int64) {
 	_, value = jsn.GetInt64()
 	return
 }
 
-func (jsn *Jonson) GetFloat32() (isFloat32 bool, value float32) {
+func (jsn *JSON) GetFloat32() (isFloat32 bool, value float32) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isFloat32 = jsn.kind == reflect.Float32
@@ -169,12 +169,12 @@ func (jsn *Jonson) GetFloat32() (isFloat32 bool, value float32) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeFloat32() (value float32) {
+func (jsn *JSON) GetUnsafeFloat32() (value float32) {
 	_, value = jsn.GetFloat32()
 	return
 }
 
-func (jsn *Jonson) GetFloat64() (isFloat64 bool, value float64) {
+func (jsn *JSON) GetFloat64() (isFloat64 bool, value float64) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isFloat64 = jsn.kind == reflect.Float64
@@ -184,12 +184,12 @@ func (jsn *Jonson) GetFloat64() (isFloat64 bool, value float64) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeFloat64() (value float64) {
+func (jsn *JSON) GetUnsafeFloat64() (value float64) {
 	_, value = jsn.GetFloat64()
 	return
 }
 
-func (jsn *Jonson) GetBool() (isBool bool, value bool) {
+func (jsn *JSON) GetBool() (isBool bool, value bool) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isBool = jsn.kind == reflect.Bool
@@ -199,12 +199,12 @@ func (jsn *Jonson) GetBool() (isBool bool, value bool) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeBool() (value bool) {
+func (jsn *JSON) GetUnsafeBool() (value bool) {
 	_, value = jsn.GetBool()
 	return
 }
 
-func (jsn *Jonson) GetString() (isString bool, value string) {
+func (jsn *JSON) GetString() (isString bool, value string) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isString = jsn.kind == reflect.String
@@ -214,12 +214,12 @@ func (jsn *Jonson) GetString() (isString bool, value string) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeString() (value string) {
+func (jsn *JSON) GetUnsafeString() (value string) {
 	_, value = jsn.GetString()
 	return
 }
 
-func (jsn *Jonson) GetHashMap() (isHashMap bool, value JonsonMap) {
+func (jsn *JSON) GetHashMap() (isHashMap bool, value JonsonMap) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isHashMap = jsn.kind == reflect.Map
@@ -229,7 +229,7 @@ func (jsn *Jonson) GetHashMap() (isHashMap bool, value JonsonMap) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeHashMap() (value map[string]*Jonson) {
+func (jsn *JSON) GetUnsafeHashMap() (value map[string]*JSON) {
 	isHashMap, m := jsn.GetHashMap()
 	if isHashMap {
 		value = m
@@ -239,28 +239,28 @@ func (jsn *Jonson) GetUnsafeHashMap() (value map[string]*Jonson) {
 	return
 }
 
-func (jsn *Jonson) GetSlice() (isSlice bool, value []*Jonson) {
+func (jsn *JSON) GetSlice() (isSlice bool, value []*JSON) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isSlice = jsn.kind == reflect.Slice
 	if isSlice {
-		value = jsn.value.([]*Jonson)
+		value = jsn.value.([]*JSON)
 	}
 
 	return
 }
 
-func (jsn *Jonson) GetUnsafeSlice() (value []*Jonson) {
+func (jsn *JSON) GetUnsafeSlice() (value []*JSON) {
 	isSlice, m := jsn.GetSlice()
 	if isSlice {
 		value = m
 		return
 	}
-	value = make([]*Jonson, 0)
+	value = make([]*JSON, 0)
 	return
 }
 
-func (jsn *Jonson) GetUint() (isUint bool, value uint) {
+func (jsn *JSON) GetUint() (isUint bool, value uint) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isUint = jsn.kind == reflect.Uint
@@ -270,12 +270,12 @@ func (jsn *Jonson) GetUint() (isUint bool, value uint) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeUint() (value uint) {
+func (jsn *JSON) GetUnsafeUint() (value uint) {
 	_, value = jsn.GetUint()
 	return
 }
 
-func (jsn *Jonson) GetUint8() (isUint8 bool, value uint8) {
+func (jsn *JSON) GetUint8() (isUint8 bool, value uint8) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isUint8 = jsn.kind == reflect.Uint8
@@ -285,12 +285,12 @@ func (jsn *Jonson) GetUint8() (isUint8 bool, value uint8) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeUint8() (value uint8) {
+func (jsn *JSON) GetUnsafeUint8() (value uint8) {
 	_, value = jsn.GetUint8()
 	return
 }
 
-func (jsn *Jonson) GetUint16() (isUint16 bool, value uint16) {
+func (jsn *JSON) GetUint16() (isUint16 bool, value uint16) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isUint16 = jsn.kind == reflect.Uint16
@@ -300,12 +300,12 @@ func (jsn *Jonson) GetUint16() (isUint16 bool, value uint16) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeUint16() (value uint16) {
+func (jsn *JSON) GetUnsafeUint16() (value uint16) {
 	_, value = jsn.GetUint16()
 	return
 }
 
-func (jsn *Jonson) GetUint32() (isUint32 bool, value uint32) {
+func (jsn *JSON) GetUint32() (isUint32 bool, value uint32) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isUint32 = jsn.kind == reflect.Uint32
@@ -315,12 +315,12 @@ func (jsn *Jonson) GetUint32() (isUint32 bool, value uint32) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeUint32() (value uint32) {
+func (jsn *JSON) GetUnsafeUint32() (value uint32) {
 	_, value = jsn.GetUint32()
 	return
 }
 
-func (jsn *Jonson) GetUint64() (isUint64 bool, value uint64) {
+func (jsn *JSON) GetUint64() (isUint64 bool, value uint64) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isUint64 = jsn.kind == reflect.Int64
@@ -330,12 +330,12 @@ func (jsn *Jonson) GetUint64() (isUint64 bool, value uint64) {
 	return
 }
 
-func (jsn *Jonson) GetUnsafeUint64() (value uint64) {
+func (jsn *JSON) GetUnsafeUint64() (value uint64) {
 	_, value = jsn.GetUint64()
 	return
 }
 
-func (jsn *Jonson) GetHashMapKeys() []string {
+func (jsn *JSON) GetHashMapKeys() []string {
 	isMap, hMap := jsn.GetHashMap()
 	if !isMap {
 		return nil
@@ -353,7 +353,7 @@ func (jsn *Jonson) GetHashMapKeys() []string {
 	return keys
 }
 
-func (jsn *Jonson) GetSliceLen() int {
+func (jsn *JSON) GetSliceLen() int {
 	isSlice, slice := jsn.GetSlice()
 	if !isSlice {
 		return 0
@@ -364,8 +364,8 @@ func (jsn *Jonson) GetSliceLen() int {
 	return len(slice)
 }
 
-func (jsn *Jonson) atLocked(key interface{}, keys ...interface{}) *Jonson {
-	var res *Jonson = nil
+func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
+	var res *JSON = nil
 	switch reflect.TypeOf(key).Kind() {
 	case reflect.Int, reflect.Uint:
 		isSlice, arr := jsn.GetSlice()
@@ -394,7 +394,7 @@ func (jsn *Jonson) atLocked(key interface{}, keys ...interface{}) *Jonson {
 	}
 	return res
 }
-func (jsn *Jonson) At(key interface{}, keys ...interface{}) *Jonson {
+func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	res := jsn.atLocked(key, keys...)

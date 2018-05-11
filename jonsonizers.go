@@ -1,8 +1,11 @@
 package Jonson
 
-import "reflect"
+import (
+	"reflect"
+	"fmt"
+)
 
-func jonsonize(value interface{}) *Jonson {
+func jonsonize(value interface{}) *JSON {
 	if value == nil {
 		return NewEmptyJSON()
 	}
@@ -31,13 +34,13 @@ func jonsonize(value interface{}) *Jonson {
 		reflect.Int16,
 		reflect.Int32,
 		reflect.Int64:
-		return &Jonson{
+		return &JSON{
 			value:       value,
 			isPrimitive: true,
 			kind:        vo.Kind(),
 		}
 	case reflect.Struct:
-		if v, ok := value.(Jonson); ok {
+		if v, ok := value.(JSON); ok {
 			return v.Clone()
 		}
 		return jonsonizeStruct(&vo)
@@ -46,38 +49,39 @@ func jonsonize(value interface{}) *Jonson {
 	return NewEmptyJSON()
 }
 
-func jonsonizeMap(value *reflect.Value) *Jonson {
+func jonsonizeMap(value *reflect.Value) *JSON {
 	mapValue := make(JonsonMap)
 	for _, k := range value.MapKeys() {
 		// map should be only string as keys
-		keyValue := reflect.ValueOf(k)
-		if keyValue.Kind() != reflect.String{
+		keyType := reflect.TypeOf(k.Interface())
+		if keyType.Kind() != reflect.String{
+			fmt.Println("DIFFERENT TYPE")
 			continue
 		}
-		mapValue[keyValue.String()] = jonsonize(keyValue.MapIndex(k))
+		mapValue[k.String()] = jonsonize(value.MapIndex(k).Interface())
 	}
 
-	return &Jonson{
+	return &JSON{
 		value:       mapValue,
 		isPrimitive: false,
 		kind:        reflect.Map,
 	}
 }
 
-func jonsonizeSlice(value *reflect.Value) *Jonson {
-	arrValue := make([]*Jonson, value.Len())
+func jonsonizeSlice(value *reflect.Value) *JSON {
+	arrValue := make([]*JSON, value.Len())
 	for i := 0; i < value.Len(); i++ {
 		arrValue[i] = jonsonize(value.Index(i).Interface())
 	}
 
-	return &Jonson{
+	return &JSON{
 		value:       arrValue,
 		isPrimitive: false,
 		kind:        reflect.Slice,
 	}
 }
 
-func jonsonizeStruct(vo *reflect.Value) *Jonson{
+func jonsonizeStruct(vo *reflect.Value) *JSON {
 	tempMap := make(map[string]interface{})
 	typ := vo.Type()
 	for i := 0; i < typ.NumField(); i++ {

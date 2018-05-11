@@ -5,11 +5,11 @@ import (
 	"reflect"
 )
 
-func (jsn *Jonson) ToJSON() ([]byte, error) {
+func (jsn *JSON) ToJSON() ([]byte, error) {
 	return json.Marshal(jsn.ToInterface())
 }
 
-func (jsn *Jonson) ToUnsafeJson() (data []byte) {
+func (jsn *JSON) ToUnsafeJson() (data []byte) {
 	data, err := jsn.ToJSON()
 	if err != nil {
 		return []byte{}
@@ -17,7 +17,7 @@ func (jsn *Jonson) ToUnsafeJson() (data []byte) {
 	return
 }
 
-func (jsn *Jonson) ToJSONString() (string, error) {
+func (jsn *JSON) ToJSONString() (string, error) {
 	data, err := jsn.ToJSON()
 	if err != nil {
 		return "", err
@@ -25,7 +25,7 @@ func (jsn *Jonson) ToJSONString() (string, error) {
 	return string(data), nil
 }
 
-func (jsn *Jonson) ToUnsafeJSONString() string {
+func (jsn *JSON) ToUnsafeJSONString() string {
 	data, err := jsn.ToJSON()
 	if err != nil {
 		return ""
@@ -33,7 +33,7 @@ func (jsn *Jonson) ToUnsafeJSONString() string {
 	return string(data)
 }
 
-func (jsn *Jonson) ToInterface() interface{} {
+func (jsn *JSON) ToInterface() interface{} {
 	if jsn.IsPrimitive() {
 		return &jsn.value
 	}
@@ -58,9 +58,9 @@ func (jsn *Jonson) ToInterface() interface{} {
 
 	return nil
 }
-func (jsn *Jonson) Clone() *Jonson {
+func (jsn *JSON) Clone() *JSON {
 	if jsn.IsPrimitive() {
-		return &Jonson{
+		return &JSON{
 			value: jsn.value,
 			kind:  jsn.kind,
 		}
@@ -68,11 +68,11 @@ func (jsn *Jonson) Clone() *Jonson {
 
 	if jsn.IsSlice() {
 		arr := jsn.GetUnsafeSlice()
-		resArr := make([]*Jonson, len(arr))
+		resArr := make([]*JSON, len(arr))
 		for k, v := range arr {
 			resArr[k] = v.Clone()
 		}
-		return &Jonson{
+		return &JSON{
 			value: resArr,
 			kind:  reflect.Slice,
 		}
@@ -80,11 +80,11 @@ func (jsn *Jonson) Clone() *Jonson {
 
 	if jsn.IsHashMap() {
 		hMap := jsn.GetUnsafeHashMap()
-		resMap := make(map[string]*Jonson)
+		resMap := make(map[string]*JSON)
 		for k, v := range hMap {
 			resMap[k] = v.Clone()
 		}
-		return &Jonson{
+		return &JSON{
 			value: resMap,
 			kind:  reflect.Map,
 		}
