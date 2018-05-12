@@ -1,3 +1,8 @@
+/*
+	Written by Daniel Krom
+	2018
+*/
+
 package jonson
 
 import "encoding/json"
@@ -12,14 +17,14 @@ Primitive
 Map[string]interface{}
 Slice
 struct
- */
+*/
 func New(value interface{}) *JSON {
 	return jonsonize(value)
 }
 
 /*
 	Creates a new empty Jonson object with null value
- */
+*/
 func NewEmptyJSON() *JSON {
 	return &JSON{
 		value:       nil,
@@ -30,23 +35,22 @@ func NewEmptyJSON() *JSON {
 /*
 	Creates a new empty Jonson object with empty map
     {}
- */
+*/
 func NewEmptyJSONMap() *JSON {
 	return New(make(map[string]interface{}))
 }
 
-
 /*
 	Created a new empty Jonson object with empty array
     []
- */
+*/
 func NewEmptyJSONArray() *JSON {
 	return New(make([]interface{}, 0))
 }
 
 /*
 	Parses JSON returns err, nil if error
- */
+*/
 func Parse(data []byte) (err error, jsn *JSON) {
 	var m interface{}
 	err = json.Unmarshal(data, &m)
@@ -59,7 +63,7 @@ func Parse(data []byte) (err error, jsn *JSON) {
 
 /*
 	Parses JSON returns null json if error
- */
+*/
 func ParseUnsafe(data []byte) (jsn *JSON) {
 	_, jsn = Parse(data)
 	if jsn == nil {

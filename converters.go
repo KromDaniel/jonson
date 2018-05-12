@@ -1,14 +1,17 @@
+/*
+	Written by Daniel Krom
+	2018
+*/
 package jonson
 
 import (
 	"encoding/json"
 	"reflect"
-	"fmt"
 )
 
 /*
 Converts Jonson to byte array (serialize)
- */
+*/
 func (jsn *JSON) ToJSON() ([]byte, error) {
 	return json.Marshal(jsn.ToInterface())
 }
@@ -16,7 +19,7 @@ func (jsn *JSON) ToJSON() ([]byte, error) {
 /*
 Converts Jonson to byte array (serialize)
 returns empty byte array if error
- */
+*/
 func (jsn *JSON) ToUnsafeJson() (data []byte) {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -27,7 +30,7 @@ func (jsn *JSON) ToUnsafeJson() (data []byte) {
 
 /*
 Converts Jonson to json string
- */
+*/
 func (jsn *JSON) ToJSONString() (string, error) {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -39,7 +42,7 @@ func (jsn *JSON) ToJSONString() (string, error) {
 /*
 Converts Jonson to json string
 returns empty string if error
- */
+*/
 func (jsn *JSON) ToUnsafeJSONString() string {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -54,7 +57,7 @@ e.g
 [Jonson(5), Jonson("str"), Jonson(map[string]Jonson)]
 ->
 to [5, "str", map[string]interface{}]
- */
+*/
 func (jsn *JSON) ToInterface() interface{} {
 	if jsn.IsPrimitive() {
 		return jsn.value
@@ -78,18 +81,17 @@ func (jsn *JSON) ToInterface() interface{} {
 		return &resMap
 	}
 
-	fmt.Println("I AM NOTHING", jsn.kind, jsn.value)
-
 	return nil
 }
+
 /*
 Deep clone the jonson
- */
+*/
 func (jsn *JSON) Clone() *JSON {
 	if jsn.IsPrimitive() {
 		return &JSON{
-			value: jsn.value,
-			kind:  jsn.kind,
+			value:       jsn.value,
+			kind:        jsn.kind,
 			isPrimitive: true,
 		}
 	}
@@ -101,8 +103,8 @@ func (jsn *JSON) Clone() *JSON {
 			resArr[k] = v.Clone()
 		}
 		return &JSON{
-			value: resArr,
-			kind:  reflect.Slice,
+			value:       resArr,
+			kind:        reflect.Slice,
 			isPrimitive: false,
 		}
 	}
@@ -114,8 +116,8 @@ func (jsn *JSON) Clone() *JSON {
 			resMap[k] = v.Clone()
 		}
 		return &JSON{
-			value: resMap,
-			kind:  reflect.Map,
+			value:       resMap,
+			kind:        reflect.Map,
 			isPrimitive: false,
 		}
 	}

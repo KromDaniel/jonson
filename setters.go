@@ -1,9 +1,13 @@
+/*
+	Written by Daniel Krom
+	2018
+*/
 package jonson
 
 /*
 Sets a value to the current JSON,
 Makes a deep copy of the interface, removing the original reference
- */
+*/
 func (jsn *JSON) Set(v interface{}) *JSON {
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
@@ -20,7 +24,7 @@ Set a value to MapObject
 if key doesn't exists, it creates it
 
 if current json is not map, it does nothing
- */
+*/
 func (jsn *JSON) MapSet(key string, value interface{}) *JSON {
 	if !jsn.IsMap() {
 		return jsn
@@ -38,7 +42,7 @@ if current json slice, it does nothing
 
 multiple values will append in the order of the values
 SliceAppend(1,2,3,4) -> [oldSlice..., 1,2,3,4]
- */
+*/
 func (jsn *JSON) SliceAppend(value ...interface{}) *JSON {
 	if !jsn.IsSlice() {
 		return jsn
@@ -59,7 +63,7 @@ Append a value at the start of the slice
 if current json slice, it does nothing
 multiple values will append begin in the order of the values
 SliceAppend(1,2,3,4) -> [4,3,2,1, oldSlice...]
- */
+*/
 func (jsn *JSON) SliceAppendBegin(value ...interface{}) *JSON {
 	if !jsn.IsSlice() {
 		return jsn
@@ -80,7 +84,7 @@ Sets a value at index to current slice
 
 if value isn't slice, it does nothing
 User must make sure the length of the slice contains the index
- */
+*/
 func (jsn *JSON) SliceSet(index int, value interface{}) *JSON {
 	if !jsn.IsSlice() {
 		return jsn

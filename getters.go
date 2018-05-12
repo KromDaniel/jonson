@@ -1,3 +1,7 @@
+/*
+	Written by Daniel Krom
+	2018
+*/
 package jonson
 
 import "reflect"

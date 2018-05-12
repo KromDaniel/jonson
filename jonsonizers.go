@@ -1,3 +1,7 @@
+/*
+	Written by Daniel Krom
+	2018
+*/
 package jonson
 
 import (
@@ -54,7 +58,7 @@ func jonsonizeMap(value *reflect.Value) *JSON {
 	for _, k := range value.MapKeys() {
 		// map should be only string as keys
 		keyType := reflect.TypeOf(k.Interface())
-		if keyType.Kind() != reflect.String{
+		if keyType.Kind() != reflect.String {
 			continue
 		}
 
