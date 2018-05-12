@@ -7,14 +7,14 @@ Fast, lightweight thread-safe Golang JSON handler\
 ### Install
 
 ```shell
-go get github.com/panthesingh/goson
+go get github.com/KromDaniel/jonson
 ```
 
 ### Quick start
 
 #### Example 1
 ```go
-import "github.com/KromDaniel/Jonson"
+import "github.com/KromDaniel/jonson"
 
 
 json := Jonson.NewEmptyHashJSON()
