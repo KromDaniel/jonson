@@ -13,7 +13,7 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 5. [Types](#types)
 6. [Convertors](#convertors)
 7. [Iterators](#iterators)
-8. [Threading](#threading)
+8. [Threads](#threads)
  
 ## Install
 
@@ -28,13 +28,14 @@ go get github.com/KromDaniel/jonson
 
 ```go
 import "github.com/KromDaniel/jonson"
+```
 
-
+```go
 err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
 if err != nil {
     // error handler
 }
-
+// jsn is a clone of the original JSON object, since it's immutable
 json.At("arr").SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
     // JSON numbers are always float when parsed
     if jsn.IsFloat64() {
@@ -45,8 +46,7 @@ json.At("arr").SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
     }
 
     if jsn.IsMap() {
-        jsObject := jsn.GetUnsafeMap()
-        jsObject["me"] = jonson.New([]int{1, 2, 3})
+        jsn.MapSet("me", []int{1, 2, 3})
     }
     return jsn
 })
@@ -76,9 +76,12 @@ fmt.Println(json.ToUnsafeJSONString())
 
 ## Getters
 
+Getters are the way to retreive the actual value of the JSON,
+Since jonson is thread safe, the value is cloned before returned, unless using `At` method
+
 #### IsType
 Jonson supports most of the reflect types
-each Jonson object can be asked for `IsType(t reflect.Kind)` or directly `IsInt()`.
+each Jonson object can be asked for `IsType(t reflect.Kind)` or directly e.g `IsInt()`.
 
 ##### Example
 ```go
@@ -120,11 +123,30 @@ json.GetUnsafeFloat64() //0 value
 ```
 
 #### Methods
-* `JSON.GetSlice()` returns `[]*jonson.JSON`
+* `JSON.At(keys ...interface{})` returns a pointer to the current key, can be chained to null values
+* `JSON.GetSlice()` returns  `[]*jonson.JSON`
 * `JSON.GetMap()` returns `map[string]*jonson.JSON`
-* `JSON.GetValue()` returns the value as `interface{}`
 * `JSON.GetObjectKeys()` returns `[]string` if JSON is map else nil
 * `JSON.GetSliceLen()` returns `int`, the length of the slice if JSON is slice, else 0
+
+#### At Method
+`JSON.At` method accepts as argument `int` or `string`</br>
+if passed a string and the JSON is not map, returns the zero JSON </br>
+if passed int and the JSON is not slice, returns the zero JSON
+It can be chained even to none existing value
+
+#### At Example
+
+```go
+js := jonson.NewEmptyJSONMap()
+js.At("KeyOfObjectWithArrayAsValue").At(12).At(54).At("key") // 12, 54 is index of slice, strin gis key of map
+// Same as
+js.At("KeyOfObjectWithArrayAsValue", 12, 54, "key")
+// same as
+js.At("KeyOfObjectWithArrayAsValue", 12).At(54, "key") 
+// same as goes on...
+```
+
 
 ## Setters
 
@@ -134,6 +156,8 @@ Setters are used to set the value of the current JSON pointer
 Since jonson is thread safe, it must be aware when trying to read or write a value, in order
 to gurantee that, value is deeply cloned, if value passed as pointer, the jonson will use the actual element it points to
 (For better performance it is usually better to pass value as pointer, so the deep clone will happen only once at the jonson cloner)
+
+For performance, use the setters provided by the library that can safely mutate each value and able to directly access it's pointer
 
 #### Methods
 
@@ -158,6 +182,7 @@ exampleMap["1"] = 4
 fmt.Println(exampleMap) // map[1:4 2:2]
 fmt.Println(json.ToUnsafeJSONString()) // {"1":1,"2":2}
 ```
+
 ### Constructors
 
 Constructors are the way to initialize a new JSON object
@@ -237,7 +262,80 @@ Convertors is a group of methods that converts the JSON object without changing 
 
 ## Iterators
 
-Iterators is a group of methods that allows iteration on slice or map
+Iterators is a group of methods that allows iteration on slice or map, it accepts a function as argument for callback
 
+The methods will do nothing is JSON is not slice or map (according the relevant method)
 
-## Threading
+**Note** Using map or filter (Similar to other languages Array.map and Array.filter), It won't return a new copy of the slice or map, it will **mutate the existing one**
+
+##### Methods
+*  `JSON.SliceForEach(cb func(jsn *JSON, index int))` -> Iterate on JSON slice
+*  `JSON.SliceMap(cb func(jsn *JSON, index int) *JSON)` -> Iterate on JSON slice, replacing each element with returned JSON
+*  `JSON.SliceFilter(cb func(jsn *JSON, index int) bool)` -> Iterate on JSON slice, removing element if cb returned false 
+*  `JSON.ObjectForEach(cb func(jsn *JSON, key string))` -> Iterate on JSON map 
+*  `JSON.ObjectMap(cb func(jsn *JSON, key string) *JSON)` -> Iterate on JSON map, replacing each value with returned JSON
+*  `JSON.ObjectFilter(cb func(jsn *JSON, key string) bool)` -> Iterate on JSON map, removing value if cb returned false 
+
+##### Example
+
+```go
+jsn := jonson.NewEmptyJSONMap()
+
+jsn.MapSet("keyA", []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+jsn.MapSet("KeyB", 1)
+jsn.MapSet("KeyC", 2)
+fmt.Println(jsn.ToUnsafeJSONString()) // {"KeyB":1,"KeyC":2,"keyA":[1,2,3,4,5,6,7,8,9,10]}
+
+// Object Map, multiply integer values * 3
+jsn.ObjectMap(func(jsn *jonson.JSON, key string) *jonson.JSON {
+    if jsn.IsInt() {
+        return jonson.New(jsn.GetUnsafeInt() * 3)
+    }
+    return jsn
+    // iterate on the array, keep only evens
+}).At("keyA").SliceFilter(func(jsn *jonson.JSON, index int) (shouldKeep bool) {
+    shouldKeep = jsn.GetUnsafeInt()%2 == 0
+    return
+})
+fmt.Println(jsn.ToUnsafeJSONString()) // {"KeyB":3,"KeyC":6,"keyA":[2,4,6,8,10]}
+```
+## Threads
+
+Jonson managed thread safety by it self, it using read-writer mutex `sync.RWMutex`
+allowing multple readers the same time
+
+#### Example
+```go
+func writer(jsn *jonson.JSON, wg *sync.WaitGroup) {
+	for i :=0 ; i < 100000; i++ {
+		jsn.SliceAppend(i)
+	}
+	wg.Done()
+}
+
+func reader(jsn *jonson.JSON, wg *sync.WaitGroup) {
+	time.Sleep(time.Nanosecond * 1000)
+	fmt.Println("Reader", jsn.GetSliceLen())
+	wg.Done()
+}
+
+func main() {
+	wg := sync.WaitGroup{}
+	arr := jonson.NewEmptyJSONArray()
+	wg.Add(5)
+	go writer(arr, &wg)
+	for i:=0; i < 4; i++{
+		go reader(arr, &wg)
+	}
+	wg.Wait()
+	fmt.Println("Final len", arr.GetSliceLen())
+}
+
+/* Output
+Reader 5650
+Reader 5651
+Reader 5652
+Reader 5651
+Final len 100000
+*/
+```

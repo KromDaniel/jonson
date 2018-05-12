@@ -19,7 +19,6 @@ func (jsn *JSON) SliceForEach(cb func(jsn *JSON, index int)) *JSON {
 // iterates on slice with map callback, transforming the slice to new slice
 func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) *JSON) *JSON {
 	isSlice, slice := jsn.GetSlice()
-
 	if !isSlice {
 		return jsn
 	}
@@ -31,7 +30,6 @@ func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) *JSON) *JSON {
 	jsn.rwMutex.RUnlock()
 	jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
-
 	jsn.value = mappedArr
 	return jsn
 }

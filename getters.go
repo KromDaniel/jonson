@@ -19,12 +19,6 @@ func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
 	return res
 }
 
-func (jsn *JSON) GetValue() interface{} {
-	jsn.rwMutex.RLock()
-	defer jsn.rwMutex.RUnlock()
-	return jsn.value
-}
-
 func (jsn *JSON) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
@@ -387,8 +381,8 @@ func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
 	var res *JSON
 	switch reflect.TypeOf(key).Kind() {
 	case reflect.Int, reflect.Uint:
-		isSlice, arr := jsn.GetSlice()
-		if isSlice {
+		if jsn.IsSlice() {
+			arr := jsn.value.([]*JSON)
 			index := key.(int)
 			if index < len(arr) {
 				res = arr[index]
@@ -396,9 +390,9 @@ func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
 		}
 		break
 	case reflect.String:
-		isObject, obj := jsn.GetMap()
-		if isObject {
+		if jsn.IsMap() {
 			mapKey := key.(string)
+			obj := jsn.value.(map[string]*JSON)
 			if val, ok := obj[mapKey]; ok {
 				res = val
 			}

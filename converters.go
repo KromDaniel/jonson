@@ -3,6 +3,7 @@ package jonson
 import (
 	"encoding/json"
 	"reflect"
+	"fmt"
 )
 
 /*
@@ -56,7 +57,7 @@ to [5, "str", map[string]interface{}]
  */
 func (jsn *JSON) ToInterface() interface{} {
 	if jsn.IsPrimitive() {
-		return &jsn.value
+		return jsn.value
 	}
 
 	if jsn.IsSlice() {
@@ -77,6 +78,8 @@ func (jsn *JSON) ToInterface() interface{} {
 		return &resMap
 	}
 
+	fmt.Println("I AM NOTHING", jsn.kind, jsn.value)
+
 	return nil
 }
 /*
@@ -87,6 +90,7 @@ func (jsn *JSON) Clone() *JSON {
 		return &JSON{
 			value: jsn.value,
 			kind:  jsn.kind,
+			isPrimitive: true,
 		}
 	}
 
@@ -99,6 +103,7 @@ func (jsn *JSON) Clone() *JSON {
 		return &JSON{
 			value: resArr,
 			kind:  reflect.Slice,
+			isPrimitive: false,
 		}
 	}
 
@@ -111,6 +116,7 @@ func (jsn *JSON) Clone() *JSON {
 		return &JSON{
 			value: resMap,
 			kind:  reflect.Map,
+			isPrimitive: false,
 		}
 	}
 

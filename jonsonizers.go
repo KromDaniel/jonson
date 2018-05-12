@@ -11,6 +11,7 @@ func jonsonize(value interface{}) *JSON {
 	vo := reflect.ValueOf(value)
 	if vo.Kind() == reflect.Ptr {
 		vo = vo.Elem()
+		value = vo.Interface()
 	}
 	switch vo.Kind() {
 	case reflect.Ptr:

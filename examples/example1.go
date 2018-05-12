@@ -1,22 +1,22 @@
 /*
 	Example 1
 
- */
+*/
 
 package main
 
 import (
-	"github.com/KromDaniel/jonson"
 	"fmt"
+
+	"github.com/KromDaniel/jonson"
 )
 
 func main() {
-
 	err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
 	if err != nil {
 		// error handler
 	}
-
+	// jsn is a clone of the original JSON object, since it's immutable
 	json.At("arr").SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
 		// JSON numbers are always float when parsed
 		if jsn.IsFloat64() {
@@ -27,8 +27,7 @@ func main() {
 		}
 
 		if jsn.IsMap() {
-			jsObject := jsn.GetUnsafeMap()
-			jsObject["me"] = jonson.New([]int{1, 2, 3})
+			jsn.MapSet("me", []int{1, 2, 3})
 		}
 		return jsn
 	})
