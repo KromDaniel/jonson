@@ -11,7 +11,7 @@ import (
 )
 
 func main(){
-	json := Jonson.NewEmptyHashJSON()
+	json := Jonson.NewEmptyJSONObject()
 	json.HashSet("keyA", 1).HashSet("keyB", []int{1,2,3,4,5}) // {"keyA":1,"keyB":[1,2,3,4,5]}
 	// map the array and filter it
 	json.At("keyB").SliceMap(func(jonson *Jonson.JSON, i int) interface{} {
@@ -30,4 +30,5 @@ func main(){
 	})
 
 	fmt.Println(json.ToUnsafeJSONString())
+
 }

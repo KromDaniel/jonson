@@ -5,10 +5,17 @@ import (
 	"reflect"
 )
 
+/*
+Converts Jonson to byte array (serialize)
+ */
 func (jsn *JSON) ToJSON() ([]byte, error) {
 	return json.Marshal(jsn.ToInterface())
 }
 
+/*
+Converts Jonson to byte array (serialize)
+returns empty byte array if error
+ */
 func (jsn *JSON) ToUnsafeJson() (data []byte) {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -17,6 +24,9 @@ func (jsn *JSON) ToUnsafeJson() (data []byte) {
 	return
 }
 
+/*
+Converts Jonson to json string
+ */
 func (jsn *JSON) ToJSONString() (string, error) {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -25,6 +35,10 @@ func (jsn *JSON) ToJSONString() (string, error) {
 	return string(data), nil
 }
 
+/*
+Converts Jonson to json string
+returns empty string if error
+ */
 func (jsn *JSON) ToUnsafeJSONString() string {
 	data, err := jsn.ToJSON()
 	if err != nil {
@@ -33,6 +47,13 @@ func (jsn *JSON) ToUnsafeJSONString() string {
 	return string(data)
 }
 
+/*
+Returns the entire jonson tree as interface of the value
+e.g
+[Jonson(5), Jonson("str"), Jonson(map[string]Jonson)]
+->
+to [5, "str", map[string]interface{}]
+ */
 func (jsn *JSON) ToInterface() interface{} {
 	if jsn.IsPrimitive() {
 		return &jsn.value
@@ -58,6 +79,9 @@ func (jsn *JSON) ToInterface() interface{} {
 
 	return nil
 }
+/*
+Deep clones the jonson
+ */
 func (jsn *JSON) Clone() *JSON {
 	if jsn.IsPrimitive() {
 		return &JSON{

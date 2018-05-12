@@ -50,7 +50,7 @@ func jonsonize(value interface{}) *JSON {
 }
 
 func jonsonizeMap(value *reflect.Value) *JSON {
-	mapValue := make(JonsonMap)
+	mapValue := make(JSONObject)
 	for _, k := range value.MapKeys() {
 		// map should be only string as keys
 		keyType := reflect.TypeOf(k.Interface())

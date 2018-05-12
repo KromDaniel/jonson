@@ -2,10 +2,24 @@ package Jonson
 
 import "encoding/json"
 
+/*
+Creates a new Jonson Object with the value
+of the interface. the reference to interface is lost
+and it is deeply cloned
+
+Possible types:
+Primitive
+Map[string]interface{}
+Slice
+struct
+ */
 func New(value interface{}) *JSON {
 	return jonsonize(value)
 }
 
+/*
+	Creates a new empty Jonson object with null value
+ */
 func NewEmptyJSON() *JSON {
 	return &JSON{
 		value:       nil,
@@ -13,14 +27,26 @@ func NewEmptyJSON() *JSON {
 	}
 }
 
-func NewEmptyHashJSON() *JSON {
+/*
+	Creates a new empty Jonson object with empty map
+    {}
+ */
+func NewEmptyJSONObject() *JSON {
 	return New(make(map[string]interface{}))
 }
 
-func NewEmptySlice() *JSON {
+
+/*
+	Created a new empty Jonson object with empty array
+    []
+ */
+func NewEmptyJSONArray() *JSON {
 	return New(make([]interface{}, 0))
 }
 
+/*
+	Parses JSON returns err, nil if error
+ */
 func Parse(data []byte) (err error, jsn *JSON) {
 	var m interface{}
 	err = json.Unmarshal(data, &m)
@@ -31,10 +57,13 @@ func Parse(data []byte) (err error, jsn *JSON) {
 	return
 }
 
-func ParseUnsafe(data []byte) *JSON {
-	_, goson := Parse(data)
-	if goson == nil {
-		return NewEmptyJSON()
+/*
+	Parses JSON returns null json if error
+ */
+func ParseUnsafe(data []byte) (jsn *JSON) {
+	_, jsn = Parse(data)
+	if jsn == nil {
+		jsn = NewEmptyJSON()
 	}
-	return goson
+	return jsn
 }

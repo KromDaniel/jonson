@@ -219,12 +219,12 @@ func (jsn *JSON) GetUnsafeString() (value string) {
 	return
 }
 
-func (jsn *JSON) GetHashMap() (isHashMap bool, value JonsonMap) {
+func (jsn *JSON) GetHashMap() (isHashMap bool, value JSONObject) {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	isHashMap = jsn.kind == reflect.Map
 	if isHashMap {
-		value = jsn.value.(JonsonMap)
+		value = jsn.value.(JSONObject)
 	}
 	return
 }
@@ -235,7 +235,7 @@ func (jsn *JSON) GetUnsafeHashMap() (value map[string]*JSON) {
 		value = m
 		return
 	}
-	value = make(JonsonMap)
+	value = make(JSONObject)
 	return
 }
 
@@ -364,6 +364,22 @@ func (jsn *JSON) GetSliceLen() int {
 	return len(slice)
 }
 
+// Returns the jonson value at some path
+// can be chained or\and using multiple keys
+// String key will assume the jonson is object
+// int key will assume the jonson is slice
+// if the path is wrong the empty json is returned
+//
+// Jonson.ParseUnsafe([]byte("{\"foo\" : \"bar\"}")).At("keyThatDoesnotExists"
+//
+// At("key","subKey",5, 7) same as .At("key")
+func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+	res := jsn.atLocked(key, keys...)
+	return res
+}
+
 func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
 	var res *JSON = nil
 	switch reflect.TypeOf(key).Kind() {
@@ -394,10 +410,5 @@ func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
 	}
 	return res
 }
-func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
-	jsn.rwMutex.RLock()
-	defer jsn.rwMutex.RUnlock()
-	res := jsn.atLocked(key, keys...)
-	return res
-}
+
 

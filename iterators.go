@@ -78,7 +78,7 @@ func (jsn *JSON) HashMapMap(cb func(*JSON, string) interface{})  *JSON {
 	}
 
 	jsn.rwMutex.RLock()
-	res := make(JonsonMap)
+	res := make(JSONObject)
 	for k, v := range hMap {
 		res[k] = jonsonize(cb(v, k))
 	}
@@ -98,7 +98,7 @@ func (jsn *JSON) HashMapFilter(cb func(*JSON, string) bool)  *JSON {
 	}
 
 	jsn.rwMutex.RLock()
-	res := make(JonsonMap)
+	res := make(JSONObject)
 	for k, v := range hMap {
 		if cb(v, k) {
 			res[k] = v
