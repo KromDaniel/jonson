@@ -269,12 +269,12 @@ The methods will do nothing is JSON is not slice or map (according the relevant 
 **Note** Using map or filter (Similar to other languages Array.map and Array.filter), It won't return a new copy of the slice or map, it will **mutate the existing one**
 
 ##### Methods
-*  `JSON.SliceForEach(cb func(jsn *JSON, index int))` -> Iterate on JSON slice
-*  `JSON.SliceMap(cb func(jsn *JSON, index int) *JSON)` -> Iterate on JSON slice, replacing each element with returned JSON
-*  `JSON.SliceFilter(cb func(jsn *JSON, index int) bool)` -> Iterate on JSON slice, removing element if cb returned false 
-*  `JSON.ObjectForEach(cb func(jsn *JSON, key string))` -> Iterate on JSON map 
-*  `JSON.ObjectMap(cb func(jsn *JSON, key string) *JSON)` -> Iterate on JSON map, replacing each value with returned JSON
-*  `JSON.ObjectFilter(cb func(jsn *JSON, key string) bool)` -> Iterate on JSON map, removing value if cb returned false 
+*  `JSON.SliceForEach(cb func(jsn *JSON, index int))` Iterate on JSON slice
+*  `JSON.SliceMap(cb func(jsn *JSON, index int) *JSON)` Iterate on JSON slice, replacing each element with returned JSON
+*  `JSON.SliceFilter(cb func(jsn *JSON, index int) bool)` Iterate on JSON slice, removing element if cb returned false 
+*  `JSON.ObjectForEach(cb func(jsn *JSON, key string))` Iterate on JSON map 
+*  `JSON.ObjectMap(cb func(jsn *JSON, key string) *JSON)` Iterate on JSON map, replacing each value with returned JSON
+*  `JSON.ObjectFilter(cb func(jsn *JSON, key string) bool)` Iterate on JSON map, removing value if cb returned false 
 
 ##### Example
 
