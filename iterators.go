@@ -1,4 +1,4 @@
-package Jonson
+package jonson
 
 // iterates on slice
 func (jsn *JSON) SliceForEach(cb func(jsn *JSON, index int)) *JSON {
@@ -17,7 +17,7 @@ func (jsn *JSON) SliceForEach(cb func(jsn *JSON, index int)) *JSON {
 }
 
 // iterates on slice with map callback, transforming the slice to new slice
-func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) interface{}) *JSON {
+func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) *JSON) *JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
@@ -26,7 +26,7 @@ func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) interface{}) *JSON {
 	jsn.rwMutex.RLock()
 	mappedArr := make([]*JSON, len(slice))
 	for i, v := range slice {
-		mappedArr[i] = jonsonize(cb(v, i))
+		mappedArr[i] = cb(v, i)
 	}
 	jsn.rwMutex.RUnlock()
 	jsn.rwMutex.Lock()
@@ -75,7 +75,7 @@ func (jsn *JSON) ObjectForEach(cb func(jsn *JSON, key string)) *JSON {
 }
 
 // iterates on object, replacing each value with new returned value
-func (jsn *JSON) ObjectMap(cb func(jsn *JSON, key string) interface{}) *JSON {
+func (jsn *JSON) ObjectMap(cb func(jsn *JSON, key string) *JSON) *JSON {
 	isMap, hMap := jsn.GetMap()
 
 	if !isMap {
@@ -85,7 +85,7 @@ func (jsn *JSON) ObjectMap(cb func(jsn *JSON, key string) interface{}) *JSON {
 	jsn.rwMutex.RLock()
 	res := make(map[string]*JSON)
 	for k, v := range hMap {
-		res[k] = jonsonize(cb(v, k))
+		res[k] = cb(v, k)
 	}
 	jsn.rwMutex.RUnlock()
 	jsn.rwMutex.Lock()

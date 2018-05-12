@@ -10,25 +10,29 @@ import (
 	"fmt"
 )
 
-func main(){
-	json := Jonson.NewEmptyJSONObject()
-	json.MapSet("keyA", 1).MapSet("keyB", []int{1,2,3,4,5}) // {"keyA":1,"keyB":[1,2,3,4,5]}
-	// map the array and filter it
-	json.At("keyB").SliceMap(func(jonson *Jonson.JSON, i int) interface{} {
-		return jonson.GetUnsafeInt() * 3 // {"keyA":1,"keyB":[3,6,9,12,15]}
-	}).SliceFilter(func(jonson *Jonson.JSON, i int) bool {
-		return jonson.GetUnsafeInt() % 5 == 0 // {"keyA":1,"keyB":[15]}
+func main() {
+
+	err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
+	if err != nil {
+		// error handler
+	}
+
+	json.At("arr").SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
+		// JSON numbers are always float when parsed
+		if jsn.IsFloat64() {
+			return jonson.New(jsn.GetUnsafeFloat64() * float64(4))
+		}
+		if jsn.IsString() {
+			return jonson.New("_" + jsn.GetUnsafeString())
+		}
+
+		if jsn.IsMap() {
+			jsObject := jsn.GetUnsafeMap()
+			jsObject["me"] = jonson.New([]int{1, 2, 3})
+		}
+		return jsn
 	})
-
-	someMap := make(map[string]interface{})
-	someMap["nested"] = "I'm nested value"
-	json.At("keyB").SliceAppendBegin("someString", 90,someMap) //{"keyA":1,"keyB":[{"nested":"I'm nested value"},90,"someString",15]}
-
-	// let's remove keyA
-	json.ObjectFilter(func(json *Jonson.JSON, s string) bool {
-		return !json.IsInt()  //{"keyB":[{"nested":"I'm nested value"},90,"someString",15]}
-	})
-
+	// {"arr":[4,8,"_str",{"me":[1,2,3],"nestedFooA":"nestedBar"}],"foo":"bar"}
 	fmt.Println(json.ToUnsafeJSONString())
 
 }

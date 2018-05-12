@@ -1,4 +1,4 @@
-package Jonson
+package jonson
 
 import "reflect"
 
@@ -28,6 +28,10 @@ func (jsn *JSON) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	return jsn.kind == p
+}
+
+func (jsn *JSON) IsString() bool {
+	return jsn.IsType(reflect.String)
 }
 
 func (jsn *JSON) IsInt() bool {

@@ -1,4 +1,4 @@
-package Jonson
+package jonson
 
 /*
 Sets a value to the current JSON,

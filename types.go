@@ -1,4 +1,4 @@
-package Jonson
+package jonson
 
 import (
 	"reflect"

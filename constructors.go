@@ -1,4 +1,4 @@
-package Jonson
+package jonson
 
 import "encoding/json"
 
@@ -31,7 +31,7 @@ func NewEmptyJSON() *JSON {
 	Creates a new empty Jonson object with empty map
     {}
  */
-func NewEmptyJSONObject() *JSON {
+func NewEmptyJSONMap() *JSON {
 	return New(make(map[string]interface{}))
 }
 
