@@ -4,7 +4,7 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 
 ----
 
-# Table of Contents
+## Table of Contents
 
 1. [Quick start](#install)
 2. [Getters](#getters)
