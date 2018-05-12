@@ -2,7 +2,6 @@ package jonson
 
 import (
 	"reflect"
-	"fmt"
 )
 
 func jonsonize(value interface{}) *JSON {
@@ -55,10 +54,10 @@ func jonsonizeMap(value *reflect.Value) *JSON {
 		// map should be only string as keys
 		keyType := reflect.TypeOf(k.Interface())
 		if keyType.Kind() != reflect.String{
-			fmt.Println("DIFFERENT TYPE")
 			continue
 		}
-		mapValue[k.String()] = jonsonize(value.MapIndex(k).Interface())
+
+		mapValue[k.Interface().(string)] = jonsonize(value.MapIndex(k).Interface())
 	}
 
 	return &JSON{

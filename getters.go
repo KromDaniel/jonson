@@ -2,6 +2,7 @@ package jonson
 
 import "reflect"
 
+// At
 // Returns the jonson value at some path
 // can be chained or\and using multiple keys
 // String key will assume the jonson is object
@@ -382,10 +383,8 @@ func (jsn *JSON) GetSliceLen() int {
 	return len(slice)
 }
 
-
-
 func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
-	var res *JSON = nil
+	var res *JSON
 	switch reflect.TypeOf(key).Kind() {
 	case reflect.Int, reflect.Uint:
 		isSlice, arr := jsn.GetSlice()
@@ -414,5 +413,3 @@ func (jsn *JSON) atLocked(key interface{}, keys ...interface{}) *JSON {
 	}
 	return res
 }
-
-
