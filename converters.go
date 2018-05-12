@@ -68,8 +68,8 @@ func (jsn *JSON) ToInterface() interface{} {
 		return resArr
 	}
 
-	if jsn.IsHashMap() {
-		hMap := jsn.GetUnsafeHashMap()
+	if jsn.IsMap() {
+		hMap := jsn.GetUnsafeMap()
 		resMap := make(map[string]interface{})
 		for k, v := range hMap {
 			resMap[k] = v.ToInterface()
@@ -80,7 +80,7 @@ func (jsn *JSON) ToInterface() interface{} {
 	return nil
 }
 /*
-Deep clones the jonson
+Deep clone the jonson
  */
 func (jsn *JSON) Clone() *JSON {
 	if jsn.IsPrimitive() {
@@ -102,8 +102,8 @@ func (jsn *JSON) Clone() *JSON {
 		}
 	}
 
-	if jsn.IsHashMap() {
-		hMap := jsn.GetUnsafeHashMap()
+	if jsn.IsMap() {
+		hMap := jsn.GetUnsafeMap()
 		resMap := make(map[string]*JSON)
 		for k, v := range hMap {
 			resMap[k] = v.Clone()

@@ -1,6 +1,7 @@
 package Jonson
 
-func (jsn *JSON) SliceForEach(cb func(*JSON, int)) *JSON {
+// iterates on slice
+func (jsn *JSON) SliceForEach(cb func(jsn *JSON, index int)) *JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
@@ -15,7 +16,8 @@ func (jsn *JSON) SliceForEach(cb func(*JSON, int)) *JSON {
 	return jsn
 }
 
-func (jsn *JSON) SliceMap(cb func(*JSON, int) interface{})*JSON {
+// iterates on slice with map callback, transforming the slice to new slice
+func (jsn *JSON) SliceMap(cb func(jsn *JSON, index int) interface{}) *JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
@@ -34,7 +36,8 @@ func (jsn *JSON) SliceMap(cb func(*JSON, int) interface{})*JSON {
 	return jsn
 }
 
-func (jsn *JSON) SliceFilter(cb func(*JSON, int) bool)*JSON {
+// iterates on slice with filter callback, removes values that callback returned false
+func (jsn *JSON) SliceFilter(cb func(jsn *JSON, index int) (shouldKeep bool)) *JSON {
 	isSlice, slice := jsn.GetSlice()
 
 	if !isSlice {
@@ -43,7 +46,7 @@ func (jsn *JSON) SliceFilter(cb func(*JSON, int) bool)*JSON {
 	jsn.rwMutex.RLock()
 	filteredArr := make([]*JSON, 0)
 	for i, v := range slice {
-		if cb(v, i){
+		if cb(v, i) {
 			filteredArr = append(filteredArr, slice[i])
 		}
 	}
@@ -55,8 +58,9 @@ func (jsn *JSON) SliceFilter(cb func(*JSON, int) bool)*JSON {
 	return jsn
 }
 
-func (jsn *JSON) HashMapForEach(cb func(*JSON, string)) *JSON {
-	isMap, hMap := jsn.GetHashMap()
+// iterates on object
+func (jsn *JSON) ObjectForEach(cb func(jsn *JSON, key string)) *JSON {
+	isMap, hMap := jsn.GetMap()
 
 	if !isMap {
 		return jsn
@@ -70,15 +74,16 @@ func (jsn *JSON) HashMapForEach(cb func(*JSON, string)) *JSON {
 	return jsn
 }
 
-func (jsn *JSON) HashMapMap(cb func(*JSON, string) interface{})  *JSON {
-	isMap, hMap := jsn.GetHashMap()
+// iterates on object, replacing each value with new returned value
+func (jsn *JSON) ObjectMap(cb func(jsn *JSON, key string) interface{}) *JSON {
+	isMap, hMap := jsn.GetMap()
 
 	if !isMap {
 		return jsn
 	}
 
 	jsn.rwMutex.RLock()
-	res := make(JSONObject)
+	res := make(map[string]*JSON)
 	for k, v := range hMap {
 		res[k] = jonsonize(cb(v, k))
 	}
@@ -90,15 +95,16 @@ func (jsn *JSON) HashMapMap(cb func(*JSON, string) interface{})  *JSON {
 	return jsn
 }
 
-func (jsn *JSON) HashMapFilter(cb func(*JSON, string) bool)  *JSON {
-	isMap, hMap := jsn.GetHashMap()
+// iterates on object, removing each value that cb returns false
+func (jsn *JSON) ObjectFilter(cb func(jsn *JSON, key string) (shouldKeep bool)) *JSON {
+	isMap, hMap := jsn.GetMap()
 
 	if !isMap {
 		return jsn
 	}
 
 	jsn.rwMutex.RLock()
-	res := make(JSONObject)
+	res := make(map[string]*JSON)
 	for k, v := range hMap {
 		if cb(v, k) {
 			res[k] = v
