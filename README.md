@@ -14,6 +14,7 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 6. [Convertors](#convertors)
 7. [Iterators](#iterators)
 8. [Threads](#threads)
+9. [License](#license)
  
 ## Install
 
@@ -339,3 +340,6 @@ Reader 5651
 Final len 100000
 */
 ```
+
+## Liense
+Apache 2.0
