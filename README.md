@@ -2,7 +2,10 @@
 
 Fast, lightweight, thread-safe, schemaless Golang JSON handler
 
+##### Beta version
 ----
+
+
 
 ## Table of Contents
 
@@ -15,6 +18,7 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 7. [Iterators](#iterators)
 8. [Threads](#threads)
 9. [License](#license)
+10. [Contact](#contact)
  
 ## Install
 
@@ -341,5 +345,9 @@ Final len 100000
 */
 ```
 
-## Liense
+## License
 Apache 2.0
+
+## Contact
+For any question or contribution, feel free to contact me at
+kromdan@gmail.com
