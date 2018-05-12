@@ -15,13 +15,13 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 7. [Iterators](#iterators)
 8. [Threading](#threading)
  
-### Install
+## Install
 
 ```shell
 go get github.com/KromDaniel/jonson
 ```
 
-### Quick start
+## Quick start
 
 
 ##### Parsing and working with JSON
@@ -74,7 +74,7 @@ json.At("numbers").SliceFilter(func(jsn *jonson.JSON, index int) (shouldKeep boo
 fmt.Println(json.ToUnsafeJSONString())
 ```
 
-### Getters
+## Getters
 
 #### IsType
 Jonson supports most of the reflect types
@@ -126,7 +126,7 @@ json.GetUnsafeFloat64() //0 value
 * `JSON.GetObjectKeys()` returns `[]string` if JSON is map else nil
 * `JSON.GetSliceLen()` returns `int`, the length of the slice if JSON is slice, else 0
 
-### Setters
+## Setters
 
 Setters are used to set the value of the current JSON pointer
 
@@ -171,7 +171,7 @@ Constructors are the way to initialize a new JSON object
 * `jonson.Parse([]byte) (error, *JSON)` parses the byte (assumed to be UTF-8 JSON string)
 * `jonson.ParseUnsafe([]byte) *JSON` same as `jonson.Parse` but returns the `jonson.NewEmptyJSON()` if error
 
-### Types
+## Types
 
 Jonson supports all valid types for JSON, here's how it works:
 
@@ -221,7 +221,7 @@ fmt.Println(structExample.ToUnsafeJSONString())  // {"Public":"public value","cu
 
 Slice is the array type of JSON, jonson supports all kind of slices, as long as each element is JSON legal
 
-### Convertors
+## Convertors
 
 Convertors is a group of methods that converts the JSON object without changing it
 
@@ -235,9 +235,9 @@ Convertors is a group of methods that converts the JSON object without changing 
 * `JSON.Clone() *JSON` Deep clone the current JSON tree
 
 
-### Iterators
+## Iterators
 
 Iterators is a group of methods that allows iteration on slice or map
 
 
-### Threading
+## Threading
