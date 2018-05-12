@@ -35,7 +35,7 @@ err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA
 if err != nil {
     // error handler
 }
-// jsn is a clone of the original JSON object, since it's immutable
+// Array mapper
 json.At("arr").SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
     // JSON numbers are always float when parsed
     if jsn.IsFloat64() {
