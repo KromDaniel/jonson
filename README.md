@@ -223,7 +223,7 @@ Slice is the array type of JSON, jonson supports all kind of slices, as long as 
 
 ### Convertors
 
-Convertors are group of methods that converts the JSON object without changing it
+Convertors is a group of methods that converts the JSON object without changing it
 
 ##### Methods
 
@@ -237,7 +237,7 @@ Convertors are group of methods that converts the JSON object without changing i
 
 ### Iterators
 
-Iterators are group of methods that allows iteration on slice or map
+Iterators is a group of methods that allows iteration on slice or map
 
 
 ### Threading
