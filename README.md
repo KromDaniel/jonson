@@ -123,7 +123,7 @@ Since there are many type of numbers, There's a getter for each type  e.g `IsUin
 
 **Note** When parsing JSON string, the default value of a number is `Float64`
 
-##### Example
+###### Example
 ```go
 json := jonson.New("hello")
 json.IsString() // true
@@ -140,7 +140,7 @@ json.IsNumber() // true
 
 Each of reflect.Kind type has a getter and unsafe getter, unsafe getter returns the zero value for that type if type is wrong
 
-##### Example
+###### Example
 ```go
 json := jonson.New(96)
 isInt, val := json.GetInt()
@@ -324,7 +324,7 @@ The methods will do nothing is JSON is not slice or map (according the relevant 
 *  `JSON.ObjectMap(cb func(jsn *JSON, key string) *JSON)` Iterate on JSON map, replacing each value with returned JSON
 *  `JSON.ObjectFilter(cb func(jsn *JSON, key string) bool)` Iterate on JSON map, removing value if cb returned false 
 
-##### Example
+###### Example
 
 ```go
 jsn := jonson.NewEmptyJSONMap()
@@ -352,7 +352,7 @@ fmt.Println(jsn.ToUnsafeJSONString()) // {"KeyB":3,"KeyC":6,"keyA":[2,4,6,8,10]}
 Jonson managed thread safety by it self, it using read-writer mutex `sync.RWMutex`
 allowing multple readers the same time
 
-#### Example
+###### Example
 ```go
 func writer(jsn *jonson.JSON, wg *sync.WaitGroup) {
 	for i :=0 ; i < 100000; i++ {
