@@ -1,6 +1,6 @@
 # Jonson
 
-Fast, lightweight, thread-safe, schemaless Golang JSON handler
+Fast, lightweight, thread-safe, schema-less Golang JSON handler
 
 ##### Beta version
 ----
@@ -14,11 +14,12 @@ Fast, lightweight, thread-safe, schemaless Golang JSON handler
 3. [Setters](#setters)
 4. [Constructors](#constructors)
 5. [Types](#types)
-6. [Convertors](#convertors)
-7. [Iterators](#iterators)
-8. [Threads](#threads)
-9. [License](#license)
-10. [Contact](#contact)
+6. [Mutators](#mutators)
+7. [Converters](#converters)
+8. [Iterators](#iterators)
+9. [Threads](#threads)
+10. [License](#license)
+11. [Contact](#contact)
  
 ## Install
 
@@ -186,7 +187,7 @@ For performance, use the setters provided by the library that can safely mutate 
 * `JSON.MapSet(key string, v interface{})` sets value to current JSON as the current key (works only if current JSON is map type)
 * `JSON.SliceAppend(v ...interface{})` append all given values to slice (works only if current JSON is slice type)
 * `JSON.SliceAppendBegin(v ...interface{})` same as `SliceAppend` but at the start of the slice instead at the end
-* `JSON.SliceSet(index int, v interace{})` overrides value at specific index on slice (works only if current JSON is slice type)
+* `JSON.SliceSet(index int, v interface{})` overrides value at specific index on slice (works only if current JSON is slice type)
 
 ##### Example
 
@@ -266,10 +267,22 @@ fmt.Println(structExample.ToUnsafeJSONString())  // {"Public":"public value","cu
 ##### Slice
 
 Slice is the array type of JSON, jonson supports all kind of slices, as long as each element is JSON legal
+## Converters
+Mutators is a group of methods that mutates the existing JSON to different type, all the methods return bool indicates if success.
 
-## Convertors
+If the JSON type is `slice` or `map`, it will automatically return false
+##### Methods
 
-Convertors is a group of methods that converts the JSON object without changing it
+* `JSON.MutateToInt() bool`
+* `JSON.MutateToFloat() bool`
+* `JSON.MutateToUnsignedInt() bool`
+* `JSON.MutateToString() bool`
+
+**Note** `MutateToFloat()` converts to type `float64`, `MutateToInt()`, `MutateToUnsignedInt()` and `MutateToString()` converts to `int`, `uint` and `string`
+
+## Converters
+
+Converters is a group of methods that converts the JSON object without changing it
 
 ##### Methods
 
