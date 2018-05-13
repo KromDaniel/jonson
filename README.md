@@ -158,11 +158,8 @@ json.GetUnsafeSlice() // 0-length []
 * `JSON.GetObjectKeys()` returns `[]string` if JSON is map else nil
 * `JSON.GetSliceLen()` returns `int`, the length of the slice if JSON is slice, else 0
 
-#### Indexer (At ethod)
-`JSON.At` method accepts as argument `int` or `string`</br>
-if passed a string and the JSON is not map, returns the zero JSON </br>
-if passed int and the JSON is not slice, returns the zero JSON
-It can be chained even to none existing value
+#### Indexer (At method)
+`JSON.At` method accepts `int` or `string` as argument, assuming `string` for map and `int` and slice, returns the zero value if wrong type
 
 #### At Example
 
@@ -254,7 +251,7 @@ fmt.Println(jonson.New(&keyMixedMap).ToUnsafeJSONString()) //{"key":"key is stri
 Struct behaves the same as with `encoding/json`
 
 Only public fields are exported, the name of the field is the key on the struct, unless there's a field descriptors with json tag `json:"customKey"`.
-If key is public and tagged with `json:"-"` it is ignored.
+Public key that tagged with `json:"-"` it is ignored.
 
 **Note** When passing a struct to Jonson, it is immediately being "Jonsonized" means the keys are converted instantly
 
@@ -284,7 +281,7 @@ Slice is the array type of JSON, jonson supports all kind of slices, as long as 
 ## Mutators
 Mutators is a group of methods that mutates the existing JSON to different type, all the methods return bool indicates if success.
 
-If the JSON type is `slice` or `map`, it will automatically return false
+JSON with type `slice` or `map`  will automatically return false
 ##### Methods
 
 * `JSON.MutateToInt() bool`
