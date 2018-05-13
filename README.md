@@ -1,6 +1,6 @@
 # Jonson
 
-Fast, lightweight, thread-safe, schema-less Golang JSON handler
+Fast, lightweight, thread-safe, schema-less golang JSON handler
 
 ##### Beta version
 ----
@@ -30,11 +30,11 @@ go get github.com/KromDaniel/jonson
 ## Quick start
 
 
-##### Parsing and working with JSON
-
 ```go
 import "github.com/KromDaniel/jonson"
 ```
+
+##### Parsing and working with JSON
 
 ```go
 err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
@@ -79,7 +79,9 @@ json.At("numbers").SliceFilter(func(jsn *jonson.JSON, index int) (shouldKeep boo
 // {"arr":[1,"str",[50,60,70]],"numbers":[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]}
 fmt.Println(json.ToUnsafeJSONString())
 ```
+
 ##### Mutating
+
 ```go
 js := jonson.New([]interface{}{55.6, 70.8, 10.4, 1, "48", "-90"})
 
@@ -99,19 +101,12 @@ fmt.Println(js.ToUnsafeJSONString()) // ["55","70",10,1,48,-90]
 ## Getters
 
 Getters are the way to retreive the actual value of the JSON,
-Since jonson is thread safe, the value is cloned before returned, unless using `At` method
+Since jonson is thread safe, primitive value is cloned before returned
 
-#### IsType
+#### Is type check
 Jonson supports most of the reflect types
-each Jonson object can be asked for `IsType(t reflect.Kind)` or directly e.g `IsInt()`.
+each Jonson object can be asked for `IsType(t reflect.Kind)` or directly e.g `IsInt()`, `IsSlice`.
 
-##### Example
-```go
-json := jonson.New("str")
-json.IsString() // true
-json.IsSlice() // false
-json.IsInt() // false
-```
 
 A legal JSON value can be one of the following types:
 
@@ -122,12 +117,24 @@ A legal JSON value can be one of the following types:
 * boolean
 * null
 
-Jonson supports the getters `IsSlice` `IsMap` and special `IsPrimitive` for string, number, boolean and null. 
+Jonson supports the getters `IsSlice` `IsMap` and  `IsPrimitive` for string, number, boolean and null. 
 
-Since there are many type of numbers, There's a getter for each type  e.g `IsUint8` `IsFloat32`
+Since there are many type of numbers, There's a getter for each type  e.g `IsUint8` `IsFloat32` or `IsNumber()`
 
-**Note** When parsing JSON string, the default value of each number is `Float64`
+**Note** When parsing JSON string, the default value of a number is `Float64`
 
+##### Example
+```go
+json := jonson.New("hello")
+json.IsString() // true
+json.IsSlice() // false
+json.IsInt() // false
+```
+
+```go
+json := jonson.New(67.98)
+json.IsNumber() // true
+```
 
 #### Value type getters
 
@@ -140,8 +147,8 @@ isInt, val := json.GetInt()
 if isInt {
     // safe, it's int
 }
-
 json.GetUnsafeFloat64() //0 value
+json.GetUnsafeSlice() // 0-length []
 ```
 
 #### Methods
@@ -151,7 +158,7 @@ json.GetUnsafeFloat64() //0 value
 * `JSON.GetObjectKeys()` returns `[]string` if JSON is map else nil
 * `JSON.GetSliceLen()` returns `int`, the length of the slice if JSON is slice, else 0
 
-#### At Method
+#### Indexer (At ethod)
 `JSON.At` method accepts as argument `int` or `string`</br>
 if passed a string and the JSON is not map, returns the zero JSON </br>
 if passed int and the JSON is not slice, returns the zero JSON
@@ -161,7 +168,7 @@ It can be chained even to none existing value
 
 ```go
 js := jonson.NewEmptyJSONMap()
-js.At("KeyOfObjectWithArrayAsValue").At(12).At(54).At("key") // 12, 54 is index of slice, strin gis key of map
+js.At("KeyOfObjectWithArrayAsValue").At(12).At(54).At("key") // 12, 54 is index of slice, string is key of map
 // Same as
 js.At("KeyOfObjectWithArrayAsValue", 12, 54, "key")
 // same as
@@ -172,14 +179,14 @@ js.At("KeyOfObjectWithArrayAsValue", 12).At(54, "key")
 
 ## Setters
 
-Setters are used to set the value of the current JSON pointer
+Setters, just is it sounds, sets a value to current JSON
 
 #### How set works
 Since jonson is thread safe, it must be aware when trying to read or write a value, in order
-to gurantee that, value is deeply cloned, if value passed as pointer, the jonson will use the actual element it points to
-(For better performance it is usually better to pass value as pointer, so the deep clone will happen only once at the jonson cloner)
+to gurantee that, value is deeply cloned, if value passed as pointer, the jonson will use the actual element it points to.
 
-For performance, use the setters provided by the library that can safely mutate each value and able to directly access it's pointer
+**Note** For better performance pass `struct` and `map` as pointer the deep clone will happen only once at the jonson cloner.
+Prefer using the jonson setters to avoid unnecessary operations
 
 #### Methods
 
@@ -191,6 +198,7 @@ For performance, use the setters provided by the library that can safely mutate 
 
 ##### Example
 
+Deep clone understanding:
 ```go
 json := jonson.NewEmptyJSON() // nil value
 exampleMap := make(map[string]int)
@@ -205,6 +213,12 @@ fmt.Println(exampleMap) // map[1:4 2:2]
 fmt.Println(json.ToUnsafeJSONString()) // {"1":1,"2":2}
 ```
 
+Faster way to create map:
+
+```go
+json := jonson.NewEmptyJSONMap()
+json.MapSet("1", 1).MapSet("2" ,2)
+```
 ### Constructors
 
 Constructors are the way to initialize a new JSON object
