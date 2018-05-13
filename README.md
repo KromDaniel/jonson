@@ -267,7 +267,7 @@ fmt.Println(structExample.ToUnsafeJSONString())  // {"Public":"public value","cu
 ##### Slice
 
 Slice is the array type of JSON, jonson supports all kind of slices, as long as each element is JSON legal
-## Converters
+## Mutators
 Mutators is a group of methods that mutates the existing JSON to different type, all the methods return bool indicates if success.
 
 If the JSON type is `slice` or `map`, it will automatically return false
