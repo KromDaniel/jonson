@@ -78,6 +78,22 @@ json.At("numbers").SliceFilter(func(jsn *jonson.JSON, index int) (shouldKeep boo
 // {"arr":[1,"str",[50,60,70]],"numbers":[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]}
 fmt.Println(json.ToUnsafeJSONString())
 ```
+##### Mutating
+```go
+js := jonson.New([]interface{}{55.6, 70.8, 10.4, 1, "48", "-90"})
+
+js.SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
+    jsn.MutateToInt()
+    return jsn
+}).SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
+    if jsn.GetUnsafeInt() > 50{
+        jsn.MutateToString()
+    }
+    return jsn
+})
+
+fmt.Println(js.ToUnsafeJSONString()) // ["55","70",10,1,48,-90]
+```
 
 ## Getters
 

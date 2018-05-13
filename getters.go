@@ -23,6 +23,27 @@ func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
 	return res
 }
 
+func (jsn *JSON) IsNumber() bool {
+	if !jsn.isPrimitive{
+		return false
+	}
+	switch jsn.kind {
+	case reflect.Float64,
+		reflect.Float32,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64:
+		return true
+	}
+	return false
+}
 func (jsn *JSON) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
