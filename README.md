@@ -1,6 +1,6 @@
 # Jonson
 
-Fast, lightweight, thread-safe, schema-less golang JSON handler
+Fast, lightweight, thread-safe, schema-less golang JSON & types handler
 
 ##### Beta version
 ----
