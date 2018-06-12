@@ -1,6 +1,8 @@
 /*
 	Written by Daniel Krom
 	2018
+	
+	// added abillity to ignore lock
 */
 package jonson
 
