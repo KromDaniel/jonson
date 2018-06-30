@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
+	json, err := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
 	if err != nil {
 		// error handler
 	}
@@ -33,5 +33,7 @@ func main() {
 	})
 	// {"arr":[4,8,"_str",{"me":[1,2,3],"nestedFooA":"nestedBar"}],"foo":"bar"}
 	fmt.Println(json.ToUnsafeJSONString())
+
+
 
 }

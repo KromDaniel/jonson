@@ -6,16 +6,17 @@ package jonson
 
 import "reflect"
 
-// At
-// Returns the jonson value at some path
-// can be chained or\and using multiple keys
-// String key will assume the jonson is object
-// int key will assume the jonson is slice
-// if the path is wrong the empty json is returned
-//
-// Jonson.ParseUnsafe([]byte("{\"foo\" : \"bar\"}")).At("keyThatDoesNotExists").At("subKey", 3, 6 ,90)
-//
-// At("key","subKey",5, 7) equals to .At("key").At(5).At(7) equals to At("key",5).At(7)
+/*
+At returns the jonson value at some path
+can be chained or\and using multiple keys
+String key will assume the jonson is object
+int key will assume the jonson is slice
+if the path is wrong the empty json is returned
+
+Jonson.ParseUnsafe([]byte("{\"foo\" : \"bar\"}")).At("keyThatDoesNotExists").At("subKey", 3, 6 ,90)
+
+At("key","subKey",5, 7) equals to .At("key").At(5).At(7) equals to At("key",5).At(7)
+*/
 func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
@@ -23,8 +24,11 @@ func (jsn *JSON) At(key interface{}, keys ...interface{}) *JSON {
 	return res
 }
 
+/*
+IsNumber returns a boolean indicates is the value is number, can be any valid number type
+*/
 func (jsn *JSON) IsNumber() bool {
-	if !jsn.isPrimitive{
+	if !jsn.isPrimitive {
 		return false
 	}
 	switch jsn.kind {
@@ -44,16 +48,26 @@ func (jsn *JSON) IsNumber() bool {
 	}
 	return false
 }
+
+/*
+IsType returns a boolean indicates if the Jonson value is that type
+*/
 func (jsn *JSON) IsType(p reflect.Kind) bool {
 	jsn.rwMutex.RLock()
 	defer jsn.rwMutex.RUnlock()
 	return jsn.kind == p
 }
 
+/*
+IsString -> is the value type is string
+*/
 func (jsn *JSON) IsString() bool {
 	return jsn.IsType(reflect.String)
 }
 
+/*
+IsInt -> is the value type is int (default int 64)
+*/
 func (jsn *JSON) IsInt() bool {
 	return jsn.IsType(reflect.Int)
 }
@@ -389,6 +403,20 @@ func (jsn *JSON) GetObjectKeys() []string {
 		i++
 	}
 	return keys
+}
+
+func (jsn *JSON) ObjectKeyExists(key string) (exists bool) {
+	isMap, hMap := jsn.GetMap()
+	if !isMap {
+		return false
+	}
+
+	jsn.rwMutex.RLock()
+	defer jsn.rwMutex.RUnlock()
+
+	_, exists = hMap[key]
+
+	return
 }
 
 func (jsn *JSON) GetSliceLen() int {

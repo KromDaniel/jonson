@@ -2,6 +2,7 @@
 	Written by Daniel Krom
 	2018
 */
+
 package jonson
 
 import (
@@ -10,17 +11,17 @@ import (
 )
 
 /*
-Converts Jonson to byte array (serialize)
+ToJSON converts Jonson to byte array (serialize)
 */
 func (jsn *JSON) ToJSON() ([]byte, error) {
 	return json.Marshal(jsn.ToInterface())
 }
 
 /*
-Converts Jonson to byte array (serialize)
+ToUnsafeJSON converts Jonson to byte array (serialize)
 returns empty byte array if error
 */
-func (jsn *JSON) ToUnsafeJson() (data []byte) {
+func (jsn *JSON) ToUnsafeJSON() (data []byte) {
 	data, err := jsn.ToJSON()
 	if err != nil {
 		return []byte{}
@@ -29,7 +30,7 @@ func (jsn *JSON) ToUnsafeJson() (data []byte) {
 }
 
 /*
-Converts Jonson to json string
+ToJSONString converts Jonson to json string
 */
 func (jsn *JSON) ToJSONString() (string, error) {
 	data, err := jsn.ToJSON()
@@ -40,7 +41,7 @@ func (jsn *JSON) ToJSONString() (string, error) {
 }
 
 /*
-Converts Jonson to json string
+ToUnsafeJSONString converts Jonson to json string
 returns empty string if error
 */
 func (jsn *JSON) ToUnsafeJSONString() string {
@@ -52,7 +53,7 @@ func (jsn *JSON) ToUnsafeJSONString() string {
 }
 
 /*
-Returns the entire jonson tree as interface of the value
+ToInterface returns the entire jonson tree as interface of the value
 e.g
 [Jonson(5), Jonson("str"), Jonson(map[string]Jonson)]
 ->
@@ -85,7 +86,7 @@ func (jsn *JSON) ToInterface() interface{} {
 }
 
 /*
-Deep clone the jonson
+Clone deep the jonson
 */
 func (jsn *JSON) Clone() *JSON {
 	if jsn.IsPrimitive() {

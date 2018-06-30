@@ -17,7 +17,6 @@ func main(){
 		}
 		return jsn
 	})
-
 	fmt.Println(js.ToUnsafeJSONString()) // ["55","70",10,1,48,-90]
 
 }

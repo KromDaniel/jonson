@@ -1,8 +1,8 @@
 /*
 	Written by Daniel Krom
 	2018
-	
-	// added abillity to ignore lock
+
+	// added ability to ignore lock
 */
 package jonson
 
@@ -120,4 +120,79 @@ func (jsn *JSON) ObjectFilter(cb func(jsn *JSON, key string) (shouldKeep bool)) 
 
 	jsn.value = res
 	return jsn
+}
+
+func EqualsDeep(left *JSON, right *JSON) bool {
+	if left.kind != right.kind {
+		return false
+	}
+
+	if left.isPrimitive && right.isPrimitive {
+		lByte := left.ToUnsafeJSON()
+		rByte := right.ToUnsafeJSON()
+		if len(lByte) != len(rByte) {
+			return false
+		}
+		// if they are the same type, let's just compare the bytes, easiest way to do it
+		for i := range lByte {
+			if lByte[i] != rByte[i] {
+				return false
+			}
+		}
+		return true
+	}
+
+	if left.IsSlice() && right.IsSlice() {
+		lSlice := left.GetUnsafeSlice()
+		rSlice := right.GetUnsafeSlice()
+		if len(lSlice) != len(rSlice) {
+			return false
+		}
+
+		for i := range lSlice {
+			if !EqualsDeep(lSlice[i], rSlice[i]) {
+				return false
+			}
+		}
+		return true
+	}
+
+	if left.IsMap() && right.IsMap() {
+		lKeys := left.GetObjectKeys()
+		rKeys := right.GetObjectKeys()
+		if len(lKeys) != len(rKeys) {
+			return false
+		}
+		// it is usually faster to first validate tha each key exists on the other, and only then compare
+		// because compare might be long recursive and we can find already that the next key doesn't
+		// exists on the other so we didn't need the long recursive run
+		lMap := left.GetUnsafeMap()
+		rMap := right.GetUnsafeMap()
+		for i := range lKeys {
+			lKey := lKeys[i]
+			rKey := rKeys[i]
+
+			_, hasLKeyOnRightMap := rMap[lKey]
+			if !hasLKeyOnRightMap {
+				return false
+			}
+
+			_, hasRKeyOnLeftMap := lMap[rKey]
+			if !hasRKeyOnLeftMap {
+				return false
+			}
+		}
+
+		// on this loop, we already know that the keys are exactly the same
+
+		for key := range lMap {
+			if !EqualsDeep(lMap[key], rMap[key]) {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	return false
 }

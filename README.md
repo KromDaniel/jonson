@@ -1,10 +1,7 @@
 # Jonson
 
-Fast, lightweight, thread-safe, schema-less golang JSON & types handler
-
-##### Beta version
+Fast, lightweight, thread-safe, dynamic-type Go-lang utility and easy JSON handler
 ----
-
 
 
 ## Table of Contents
@@ -18,8 +15,9 @@ Fast, lightweight, thread-safe, schema-less golang JSON & types handler
 7. [Converters](#converters)
 8. [Iterators](#iterators)
 9. [Threads](#threads)
-10. [License](#license)
-11. [Contact](#contact)
+10. [Dependencies](#dependencies)
+11. [License](#license)
+12. [Contact](#contact)
  
 ## Install
 
@@ -37,7 +35,7 @@ import "github.com/KromDaniel/jonson"
 ##### Parsing and working with JSON
 
 ```go
-err, json := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
+json, err := jonson.Parse([]byte(`{"foo": "bar", "arr": [1,2,"str", {"nestedFooA" : "nestedBar"}]}`))
 if err != nil {
     // error handler
 }
@@ -61,7 +59,7 @@ fmt.Println(json.ToUnsafeJSONString())
 
 ```
 
-##### Creating JSON
+##### Creating JSON from zero
 
 ```go
 json := jonson.NewEmptyJSONMap()
@@ -96,6 +94,37 @@ js.SliceMap(func(jsn *jonson.JSON, index int) *jonson.JSON {
 })
 
 fmt.Println(js.ToUnsafeJSONString()) // ["55","70",10,1,48,-90]
+```
+
+##### Deep Compare
+
+```go
+
+left := New(5)
+right := New("5")
+
+EqualsDeep(left, right) // false
+
+const exampleJSON = `
+[
+  {
+    "key": 0.8215845637650305,
+    "date": "2018-05-30T13:39:19.867Z"
+  },
+  {
+    "key": 0.8773275487707828,
+    "date": "2018-04-30T13:39:19.867Z"
+  }
+]`
+
+left = ParseUnsafe([]byte(testJsonString))
+right = ParseUnsafe([]byte(testJsonString))
+
+EqualsDeep(left, right) // true
+
+left.SliceAppend(56)
+
+EqualsDeep(left, right) // false
 ```
 
 ## Getters
@@ -384,6 +413,8 @@ Reader 5651
 Final len 100000
 */
 ```
+## Dependencies
+Jonson is fully free from 3rd party dependencies, the unit tests are also free of any dependencies
 
 ## License
 Apache 2.0

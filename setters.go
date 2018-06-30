@@ -35,6 +35,16 @@ func (jsn *JSON) MapSet(key string, value interface{}) *JSON {
 	return jsn
 }
 
+func (jsn *JSON) DeleteMapKey(key string) *JSON {
+	if !jsn.IsMap() {
+		return jsn
+	}
+	jsn.rwMutex.Lock()
+	defer jsn.rwMutex.Unlock()
+	delete(jsn.value.(map[string]*JSON), key)
+	return jsn
+}
+
 /*
 Append a value at the end of the slice
 
@@ -47,9 +57,9 @@ func (jsn *JSON) SliceAppend(value ...interface{}) *JSON {
 	if !jsn.IsSlice() {
 		return jsn
 	}
-	jsn.rwMutex.Lock()
+	/*jsn.rwMutex.Lock()
 	defer jsn.rwMutex.Unlock()
-
+	*/
 	for _, v := range value {
 		jsn.value = append(jsn.value.([]*JSON), jonsonize(v))
 	}
