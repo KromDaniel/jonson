@@ -1,7 +1,6 @@
 # Jonson
 
-### Fast, lightweight, thread-safe, dynamic-type Go-lang utility and easy JSON handler
-----
+Fast, lightweight, thread safe, dynamic type and schema-less golang utility and easy JSON handler
 
 
 ## Table of Contents
